@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SythesizerLibrary.Core.Audio.OutputChannel" Collapsed="true">
+    <Position X="8" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAQAAAAAAAAIAAAAAAAAAgAAEAAAECEAA=</HashCode>
+      <FileName>Core\Audio\OutputChannel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SythesizerLibrary.Core.Audio.Sink" Collapsed="true">
+    <Position X="6.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Audio\Sink.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SythesizerLibrary.Core.Audio.AudioProvider" Collapsed="true">
+    <Position X="11" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAACAAAAAAAAAAAAQAAAAgAAABgAAAAAACAAAAEAA=</HashCode>
+      <FileName>Core\Audio\AudioProvider.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_device" />
+      <Field Name="_sink" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SythesizerLibrary.Core.Audio.Device" Collapsed="true">
+    <Position X="6.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Audio\Device.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SythesizerLibrary.Core.Audio.WasapiAudioProvider" Collapsed="true">
+    <Position X="12" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAQAAAA=</HashCode>
+      <FileName>Core\Audio\WasapiAudioProvider.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_audioOutput" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="NAudio.Wave.WasapiOut" Collapsed="true">
+    <Position X="13.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="SythesizerLibrary.Core.Automation" Collapsed="true">
+    <Position X="10" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ADAABAAAIAAAAgAAAAAABAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Automation.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_inputChannel" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="SythesizerLibrary.DSP.Oscillator" Collapsed="true">
+    <Position X="0.75" Y="4" Width="1.5" />
+    <InheritanceLine Type="SythesizerLibrary.Core.Audio.AudioNode" FixedToPoint="true">
+      <Path>
+        <Point X="3.5" Y="2.562" />
+        <Point X="3.5" Y="4.438" />
+        <Point X="2.25" Y="4.438" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>KAAAAAAAAAABgAABCIACAAAAAAAAAAICIAEgABAAAAA=</HashCode>
+      <FileName>DSP\Oscillator.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_waveShape" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="SythesizerLibrary.Core.Audio.AudioNode" Collapsed="true">
+    <Position X="2.75" Y="2" Width="1.5" />
+    <AssociationLine Name="Outputs" Type="SythesizerLibrary.Core.Audio.Interface.IChannel">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.859" Y="0.081" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>BAQCBIgMAAAAgAAAAAAABoAAEAAAAAAAIgIAAAAAQwA=</HashCode>
+      <FileName>Core\Audio\AudioNode.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Inputs" />
+      <Property Name="Outputs" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SynthesizerLibrary.Core.Audio.InputChannel" Collapsed="true">
+    <Position X="6.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAQAAAAAAAAIAAAEAAAAAgAAEAAAEAEAA=</HashCode>
+      <FileName>Core\Audio\InputChannel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="SythesizerLibrary.DSP.LP12Filter" Collapsed="true">
+    <Position X="0.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAAAAIEAAAAAACACACAICgBAAAAIAA=</HashCode>
+      <FileName>DSP\LP12Filter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SythesizerLibrary.DSP.UpMixer" Collapsed="true">
+    <Position X="0.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>DSP\UpMixer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SythesizerLibrary.Operators.MulAdd" Collapsed="true">
+    <Position X="0.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAIAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Operators\MulAdd.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="SythesizerLibrary.Core.Audio.Interface.IChannel" Collapsed="true">
+    <Position X="4.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAQAAAAAAAAIAAAAAAAAAgAAEAAAEAEAA=</HashCode>
+      <FileName>Core\Audio\Interface\IChannel.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="SythesizerLibrary.Core.Audio.Interface.IAudioProvider" Collapsed="true">
+    <Position X="6.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAQAAAAAAAABAAAAAAACAAAAEAA=</HashCode>
+      <FileName>Core\Audio\Interface\IAudioProvider.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="SythesizerLibrary.Core.Audio.Interface.IAudioNode" Collapsed="true">
+    <Position X="3" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAQCAIgEAAAAgAAAAAAABoAAEAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>Core\Audio\Interface\IAudioNode.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="SythesizerLibrary.DSP.WaveShape" Collapsed="true">
+    <Position X="0.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAABgAABAAAAAAAAAAAAAAIAAAAgAAAAAAA=</HashCode>
+      <FileName>DSP\WaveShape.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

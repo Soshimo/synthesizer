@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33403.182
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynthesizerLibrary", "SynthesizerLibrary\SynthesizerLibrary.csproj", "{EC4E20F2-FA12-426F-82E6-069E906D8870}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSynthesizer", "TestSynthesizer\TestSynthesizer.csproj", "{ECE25A7A-4870-4948-AE22-2DF96E9D226E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Debug|x64.Build.0 = Debug|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Debug|x86.Build.0 = Debug|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Release|x64.ActiveCfg = Release|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Release|x64.Build.0 = Release|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Release|x86.ActiveCfg = Release|Any CPU
+		{EC4E20F2-FA12-426F-82E6-069E906D8870}.Release|x86.Build.0 = Release|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Debug|x64.Build.0 = Debug|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Debug|x86.Build.0 = Debug|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Release|x64.ActiveCfg = Release|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Release|x64.Build.0 = Release|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Release|x86.ActiveCfg = Release|Any CPU
+		{ECE25A7A-4870-4948-AE22-2DF96E9D226E}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C984A49-EF43-42E5-984C-BCF0B85EFC75}
+	EndGlobalSection
+EndGlobal
