@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="SynthesizerUI.PianoKeyboardControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SynthesizerUI"
+             xmlns:converters="clr-namespace:SynthesizerUI.Converters"
+             mc:Ignorable="d" 
+             x:Name="PianoKeyboard"
+             d:DesignHeight="200" d:DesignWidth="600">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="WhiteKeyTemplate">
+            <Button 
+                    CommandParameter="{Binding }" 
+                    BorderBrush="Black"
+                    BorderThickness="1" 
+                    Background="White" 
+                    Width="40" 
+                    Height="160"
+                    PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
+                    PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
+                >
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                        Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="0,0,5,5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="LightGray" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="DarkGray" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </DataTemplate>
+        <DataTemplate x:Key="BlackKeyTemplate">
+            <Button 
+         
+        CommandParameter="{Binding }" 
+        BorderBrush="Black" 
+        BorderThickness="1" 
+        Background="Black" 
+        Width="30" 
+        Height="100"
+        PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
+        PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
+        >
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                        Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="0,0,5,5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#222" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#555" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </DataTemplate>
+        <converters:NoteToCanvasLocationConverter x:Key="NoteToCanvasLeftConverter"/>
+        <converters:NoteToZIndexConverter x:Key="NoteToZIndexConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <ItemsControl  ItemsSource="{Binding PianoKeys, ElementName=PianoKeyboard}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Canvas.Left">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource NoteToCanvasLeftConverter}">
+                                    <Binding Path="Note" />
+                                    <Binding Path="TotalKeysWidth" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                    <Binding Path="Octave" />
+                                <Binding Path="ActualWidth" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                                    <Binding Path="HorizontalAlignment" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Canvas.ZIndex" Value="{Binding Note, Converter={StaticResource NoteToZIndexConverter}}" />
+                        <Setter Property="Control.Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsBlack}" Value="True">
+                                <Setter Property="ContentControl.ContentTemplate" Value="{StaticResource BlackKeyTemplate}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsBlack}" Value="False">
+                                <Setter Property="ContentControl.ContentTemplate" Value="{StaticResource WhiteKeyTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>
+    </Grid>
+</UserControl>

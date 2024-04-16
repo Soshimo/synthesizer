@@ -3,10 +3,137 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SynthesizerUI"
+        xmlns:local="clr-namespace:SynthesizerUI" xmlns:viewmodel="clr-namespace:SynthesizerUI.ViewModel"
+        xmlns:converters="clr-namespace:SynthesizerUI.Converters"
+        d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowViewModel}"
+        KeyDown="Window_KeyDown" KeyUp="Window_KeyUp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Background="Transparent"
+        Title="MainWindow" Height="700" Width="980">
+
+    <Window.Resources>
+        <ImageBrush x:Key="CloseAppDef"
+                    ImageSource="/Assets/shutdown_def.png"
+                    Stretch="None" />
+
+        <ImageBrush x:Key="CloseAppMo"
+                    ImageSource="/Assets/shutdown_mo.png"
+                    Stretch="None" />
+
+        <Style x:Key="ExitApp"
+               TargetType="{x:Type Button}">
+
+            <Setter Property="Height"
+                    Value="40" />
+            <Setter Property="Width"
+                    Value="40" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Right" />
+            <Setter Property="VerticalAlignment"
+                    Value="Top" />
+            <Setter Property="Margin"
+                    Value="0,15,15,0" />
+
+            <Setter Property="Template">
+
+                <Setter.Value>
+
+                    <ControlTemplate TargetType="{x:Type Button}">
+
+                        <Border x:Name="border"
+                                BorderThickness="0"
+                                Background="{StaticResource CloseAppDef}">
+
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+
+                                <Setter Property="Background"
+                                        TargetName="border"
+                                        Value="{StaticResource CloseAppMo}" />
+
+                            </Trigger>
+
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+
+                                <Setter Property="Background"
+                                        TargetName="border"
+                                        Value="{StaticResource CloseAppMo}" />
+
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+
+                </Setter.Value>
+
+            </Setter>
+
+        </Style>
+    </Window.Resources>
     <Grid>
+        <Border Background="#111"
+                CornerRadius="10" />
+
+        <!--<Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>-->
+
+        <Grid Grid.Column="0">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="300"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <Grid>
+                    <StackPanel>
+                        <local:KnobControl 
+                            VerticalAlignment="Top" 
+                            Value="{Binding Path=Value, Mode=TwoWay}" 
+                            Margin="0,20,0,0" 
+                            Maximum="1200"
+                            Minimum="-1200"
+                            Step="10"
+                            Width="64" 
+                            Height="64">
+                            <local:KnobControl.SpriteSheet>
+                                <local:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
+                                    <local:SpriteSheet.Range>
+                                        <local:IntegerRange End="100" />
+                                    </local:SpriteSheet.Range>
+                                </local:SpriteSheet>
+                            </local:KnobControl.SpriteSheet>
+                        </local:KnobControl>
+                    </StackPanel>
+                </Grid>
+
+                <local:PianoKeyboardControl Grid.Row="1" Grid.Column="1" PianoKeys="{Binding PianoKeys}"></local:PianoKeyboardControl>
+
+            </Grid>
+
+        </Grid>
+
+        <Button x:Name="CloseApp"
+                Style="{StaticResource ExitApp}"
+                Click="CloseApp_Click" />
+
 
     </Grid>
+
+
 </Window>

@@ -8,6 +8,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using SynthesizerUI.ViewModel;
 
 namespace SynthesizerUI
 {
@@ -18,7 +20,26 @@ namespace SynthesizerUI
     {
         public MainWindow()
         {
+            var service = Ioc.Default.GetService<ISynthesizerService>();
+
+            if(service != null)
+                DataContext = new MainWindowViewModel(service);
+
             InitializeComponent();
+
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+        }
+
+        private void CloseApp_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
-}
+} 
