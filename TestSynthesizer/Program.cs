@@ -13,47 +13,59 @@ var audioProvider = new WasapiAudioProvider();
 
 var minorKeyOfBFlat = new MinorScale("Bb", new WesternTuning());  // 2^(n/12)
 
-var foo = (float)minorKeyOfBFlat.GetFrequency(0, 2);
-var bar = (float)minorKeyOfBFlat.GetFrequency(3, 2);
+var foo = (float)minorKeyOfBFlat.GetFrequency(0, 3);
+var bar = (float)minorKeyOfBFlat.GetFrequency(4, 3);
 
-var osc1 = new Oscillator(audioProvider, foo);
+var osc1 = new Oscillator(audioProvider, foo, WaveShape.Sawtooth);
+var oscGain = new Gain(audioProvider, .5);
+osc1.Connect(oscGain);
 
-var noise = new Noise(audioProvider, NoiseColor.Brown);
-var noiseGain = new Gain(audioProvider, .05);
+//var osc2 = new Oscillator(audioProvider, bar, WaveShape.Triangle);
+//var osc2Gain = new Gain(audioProvider, .5);
+//osc2.Connect(osc2Gain);
 
-noise.Connect(noiseGain);
+//var noise = new Noise(audioProvider, NoiseColor.Pink);
+//var noiseGain = new Gain(audioProvider, .1);
+//noise.Connect(noiseGain);
 
-var gain = new Gain(audioProvider, 1);
+//var mixer = new Mixer(audioProvider, 3);
 
-noiseGain.Connect(gain);
-osc1.Connect(gain);
+//oscGain.Connect(mixer, 0);
+//osc2Gain.Connect(mixer, 1);
+//noiseGain.Connect(mixer, 2);
 
-//var lfo = new Oscillator(audioProvider, 2, WaveShape.Sawtooth);
+var env = new ADSREnvelope(audioProvider, 0, .7, 1, .75, 1.5);
 
-//lfo.Connect(gain, 1);
+//osc1.Connect(env);
 
-//var osc2 = new Oscillator(audioProvider, bar);
+//   /\___
+//  /     \
+// /      \
 
-//var filter = new LP12Filter(audioProvider, 1000);
+env.Connect(oscGain, 1);
 
-//osc1.Connect(filter);
-//osc2.Connect(filter);
-
-//var filterLfo = new Oscillator(audioProvider,.5f);
-//var filterMod = new MulAdd(audioProvider, 150, foo);
-
-//filterLfo.Connect(filterMod);
-//filterMod.Connect(filter, 1);  // connect lfo to cutoff frequency
-
-audioProvider.ConnectToOutput(gain);
+audioProvider.ConnectToOutput(oscGain);
 
 audioProvider.Play();
 
-while (true)
+
+env.Gate.SetValue(1);
+Thread.Sleep(250);
+env.Gate.SetValue(0);
+
+var exit = false;
+while (!exit)
 {
-    if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Escape)
+    if (Console.KeyAvailable)
     {
-        break;
+        var key = Console.ReadKey(true).Key;
+
+        switch (key)
+        {
+            case ConsoleKey.Escape:
+                exit = true;
+                break;
+        }
     }
 }
 

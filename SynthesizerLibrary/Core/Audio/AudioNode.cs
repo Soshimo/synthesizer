@@ -99,7 +99,7 @@ public class AudioNode : IAudioNode
         }
     }
 
-    public void Connect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
+    public virtual void Connect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
     {
         if (IsAggregate)
         {
@@ -118,7 +118,7 @@ public class AudioNode : IAudioNode
         AudioProvider.NeedTraverse = true;
     }
 
-    public void Disconnect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
+    public virtual void Disconnect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
     {
         if (IsAggregate)
         {

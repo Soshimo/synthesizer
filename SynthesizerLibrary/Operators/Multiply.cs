@@ -6,7 +6,7 @@ namespace SythesizerLibrary.Operators;
 
 public class Multiply : AudioNode
 {
-    protected readonly Automation GainValue;
+    private readonly Automation GainValue;
 
     protected Multiply(IAudioProvider provider, double gain = 1.0) : base(provider, 2, 1)
     {
