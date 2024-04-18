@@ -57,10 +57,10 @@ var bar = (float)minorKeyOfBFlat.GetFrequency(4, 3);
 //var mulAdd = new MulAdd(audioProvider, 100, foo);
 //lfo.Connect(mulAdd);
 
-//var lfo = new Oscillator(audioProvider, 2f);
+var lfo = new Oscillator(audioProvider, 2f);
 
-//var mulAdd = new MulAdd(audioProvider, 100, foo);
-//lfo.Connect(mulAdd);
+var mulAdd = new MulAdd(audioProvider, 100, foo);
+lfo.Connect(mulAdd);
 
 //var mulAdd2 = new MulAdd(audioProvider, 100, bar);
 //lfo.Connect(mulAdd2);
@@ -72,7 +72,7 @@ var oscGain = new Gain(audioProvider);
 var voice = new SynthVoice(audioProvider, foo, bar);
 voice.Connect(oscGain);
 
-//mulAdd.Connect(voice);
+mulAdd.Connect(voice);
 //mulAdd2.Connect(voice, 1);
 
 //mulAdd.Connect(voice);
@@ -108,13 +108,20 @@ while (!exit)
 
 class SynthVoice : GroupNode
 {
+    public Automation Frequency { get; }
+
+    private AutomationNode _automationNode;
     public SynthVoice(IAudioProvider provider, float frequency1, float frequency2) : base(provider, 2, 1)
     {
         var osc1 = new Oscillator(provider, frequency1, WaveShape.Sine);
         var osc2 = new Oscillator(provider, frequency2, WaveShape.Sawtooth);
 
-        _ = new Automation(this, 0, frequency1);
-        _ = new Automation(this, 1, frequency2);
+        _automationNode = new AutomationNode(provider, frequency1);
+        _automationNode.Connect(osc1);
+
+        // drive automation node with automation, so automation node acts as a "passthrough" for the automation
+        Frequency = new Automation(this, 0, frequency1);
+        //_ = new Automation(this, 1, frequency2);
 
         var mixer = new Mixer(provider, 2);
 
@@ -135,9 +142,21 @@ class SynthVoice : GroupNode
         //mulAdd.Connect(osc1);
         //mulAdd2.Connect(osc2);
 
+        // input drives => automationpassthorugh => automation
+        // automationpassthrough will have automation in constructor
+        // automationpassthrough will set the automation value in the getmix
+
 
         gain.Connect(OutputPassThroughNodes[0]);
     }
 
+    protected override void GenerateMix()
+    {
+        // TODO create a passthrough automation node to link one input to another input in the group
+        // for now we will do it manually
+        _automationNode.Value.SetValue(Frequency);
+
+        base.GenerateMix();
+    }
 }
 
