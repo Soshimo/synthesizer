@@ -6,16 +6,16 @@ namespace SythesizerLibrary.Operators;
 
 public class Multiply : AudioNode
 {
-    private readonly Automation GainValue;
+    private readonly Automation _gainValue;
 
     protected Multiply(IAudioProvider provider, double gain = 1.0) : base(provider, 2, 1)
     {
-        GainValue = new Automation(this, 1, gain);
+        _gainValue = new Automation(this, 1, gain);
     }
 
     protected override void GenerateMix()
     {
-        double value = GainValue;
+        double value = _gainValue;
         var input = Inputs[0];
         var numberOfChannels = input.Samples.Count;
 

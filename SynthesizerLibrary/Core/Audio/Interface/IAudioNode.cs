@@ -11,7 +11,7 @@ public interface IAudioNode
     IList<IChannel> Inputs { get; }
     IList<IChannel> Outputs { get; }
 
-    void Connect(IAudioNode node, int outputIndex, int inputIndex);
+    void Connect(IAudioNode node, int inputIndex, int outputIndex);
     void Disconnect(IAudioNode node, int output, int input);
     void Tick();
     List<IAudioNode> Traverse(List<IAudioNode> nodes);

@@ -104,7 +104,7 @@ public class AudioNode : IAudioNode
         if (IsAggregate)
         {
             var psNode = OutputPassThroughNodes[outputIndex];
-            psNode.Connect(node, 0, inputIndex);
+            psNode.Connect(node, inputIndex, 0);
         }
         else
         {
@@ -122,7 +122,7 @@ public class AudioNode : IAudioNode
     {
         if (IsAggregate)
         {
-            OutputPassThroughNodes[outputIndex].Disconnect(node, 0, inputIndex);
+            OutputPassThroughNodes[outputIndex].Disconnect(node,  inputIndex, 0);
         }
         else
         {
