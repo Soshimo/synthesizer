@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SythesizerLibrary.Core.Audio;
+﻿using SynthesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
 
-namespace SythesizerLibrary.DSP;
+namespace SynthesizerLibrary.DSP;
 
 public class UpMixer : AudioNode
 {

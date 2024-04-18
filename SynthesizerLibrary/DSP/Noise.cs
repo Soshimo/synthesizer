@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using SynthesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
 

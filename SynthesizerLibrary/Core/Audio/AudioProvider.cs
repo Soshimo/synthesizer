@@ -6,13 +6,13 @@ namespace SynthesizerLibrary.Core.Audio;
 
 public class AudioProvider : WaveProvider32, IAudioProvider
 {
-    private readonly Device _device;
-    private readonly Sink _sink;
+    private readonly AudioDevice _device;
+    private readonly DestinationNode _destinationNode;
 
     public AudioProvider()
     {
-        _device = new Device(this);
-        _sink = new Sink(this, _device);
+        _device = new AudioDevice(this);
+        _destinationNode = new DestinationNode(this, _device);
     }
 
     public override int Read(float[] buffer, int offset, int sampleCount)
@@ -33,6 +33,6 @@ public class AudioProvider : WaveProvider32, IAudioProvider
     public int TotalWriteTime => _device.GetWriteTime();
     public void ConnectToOutput(IAudioNode node)
     {
-        node.Connect(_sink, 0, 0);
+        node.Connect(_destinationNode, 0, 0);
     }
 }

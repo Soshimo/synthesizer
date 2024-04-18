@@ -1,4 +1,6 @@
-﻿using SythesizerLibrary.Core;
+﻿using SynthesizerLibrary.Core;
+using SynthesizerLibrary.Core.Audio;
+using SythesizerLibrary.Core;
 using SythesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
 

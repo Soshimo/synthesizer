@@ -1,7 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using SynthesizerLibrary.Core;
+using SynthesizerLibrary.Core.Audio;
 using SynthesizerLibrary.DSP;
 using SynthesizerLibrary.Util;
+using SythesizerLibrary.Core;
 using SythesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
 using SythesizerLibrary.DSP;
@@ -12,10 +15,10 @@ using SythesizerLibrary.Tuning;
 
 var audioProvider = new WasapiAudioProvider();
 
-//var minorKeyOfBFlat = new MinorScale("Bb", new WesternTuning());  // 2^(n/12)
+var minorKeyOfBFlat = new MinorScale("Bb", new WesternTuning());  // 2^(n/12)
 
-//var foo = (float)minorKeyOfBFlat.GetFrequency(0, 3);
-//var bar = (float)minorKeyOfBFlat.GetFrequency(4, 3);
+var foo = (float)minorKeyOfBFlat.GetFrequency(0, 3);
+var bar = (float)minorKeyOfBFlat.GetFrequency(4, 3);
 
 //var osc1 = new Oscillator(audioProvider, foo, WaveShape.Sawtooth);
 //var oscGain = new Gain(audioProvider, 1);
@@ -50,9 +53,29 @@ var audioProvider = new WasapiAudioProvider();
 
 //osc3.Connect(osc2, 1);
 
+//var lfo = new Oscillator(audioProvider, 2f);
+//var mulAdd = new MulAdd(audioProvider, 100, foo);
+//lfo.Connect(mulAdd);
+
+//var lfo = new Oscillator(audioProvider, 2f);
+
+//var mulAdd = new MulAdd(audioProvider, 100, foo);
+//lfo.Connect(mulAdd);
+
+//var mulAdd2 = new MulAdd(audioProvider, 100, bar);
+//lfo.Connect(mulAdd2);
+
+
+
+
 var oscGain = new Gain(audioProvider);
-var voice = new Voice(audioProvider);
+var voice = new SynthVoice(audioProvider, foo, bar);
 voice.Connect(oscGain);
+
+//mulAdd.Connect(voice);
+//mulAdd2.Connect(voice, 1);
+
+//mulAdd.Connect(voice);
 
 //var gain2 = new Gain(audioProvider);
 //osc2.Connect(gain2);
@@ -83,35 +106,37 @@ while (!exit)
 }
 
 
-
-
-public class Voice : AudioNode
+class SynthVoice : GroupNode
 {
-    private Gain oscGain;
-    private Oscillator lfo;
-    
-    public Voice(IAudioProvider provider) : base(provider, 1, 1, true)
+    public SynthVoice(IAudioProvider provider, float frequency1, float frequency2) : base(provider, 2, 1)
     {
-        var osc = new Oscillator(provider);
-        oscGain = new Gain(provider, .5);
+        var osc1 = new Oscillator(provider, frequency1, WaveShape.Sine);
+        var osc2 = new Oscillator(provider, frequency2, WaveShape.Sawtooth);
+
+        _ = new Automation(this, 0, frequency1);
+        _ = new Automation(this, 1, frequency2);
+
+        var mixer = new Mixer(provider, 2);
+
+        osc1.Connect(mixer);
+        osc2.Connect(mixer, 1);
+
+        var gain = new Gain(provider);
+        mixer.Connect(gain);
+
+        //var lfo = new Oscillator(provider, 2f);
+
+        //var mulAdd = new MulAdd(provider, 100, frequency1);
+        //lfo.Connect(mulAdd);
+
+        //var mulAdd2 = new MulAdd(provider, 100, frequency2);
+        //lfo.Connect(mulAdd2);
+
+        //mulAdd.Connect(osc1);
+        //mulAdd2.Connect(osc2);
 
 
-        osc.Connect(oscGain);
-        oscGain.Connect(OutputPassThroughNodes[0]);
-
-        lfo = new Oscillator(provider, 2f);
-
-        var multiAdd = new MulAdd(provider, .2, .5);
-        lfo.Connect(multiAdd);
-
-        multiAdd.Connect(osc, 1);
-        //lfo.Connect(osc, 1);
-        
-        //osc.Connect(oscGain);
-
-        //lfo.Connect(oscGain, 1);
-
-        oscGain.Connect(OutputPassThroughNodes[0]);
+        gain.Connect(OutputPassThroughNodes[0]);
     }
 
 }
