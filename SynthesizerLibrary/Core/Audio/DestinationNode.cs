@@ -5,15 +5,21 @@ using SythesizerLibrary.DSP;
 
 namespace SythesizerLibrary.Core.Audio;
 
-public class DestinationNode : GroupNode
+public sealed class DestinationNode : GroupNode
 {
-    public DestinationNode(IAudioProvider provider, IAudioNode device) : base(provider, 1, 0)
+    public DestinationNode(AudioProvider provider, AudioDevice device) : base(provider, 1, 0, "DestinationNode")
     {
         var mixer = new UpMixer(provider);
 
-        var scheduler = new Scheduler(provider);
+        //var scheduler = new Scheduler(provider);
+
+        // connect our input to scheduler
+        //Connect(scheduler);
+
+        var scheduler = provider.Scheduler;
 
         InputPassThroughNodes[0].Connect(scheduler, 0, 0);
+
         scheduler.Connect(mixer);
         mixer.Connect(device);
     }

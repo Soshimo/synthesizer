@@ -13,7 +13,7 @@ public class MulAdd : AudioNode
     private readonly Automation _addend;
 
 
-    public MulAdd(IAudioProvider provider, double multiplier = 1, double addend = 0) : base(provider, 3, 1)
+    public MulAdd(IAudioProvider provider, double multiplier = 1, double addend = 0) : base(provider, 3, 1, "MulAdd")
     {
         _multiplier = new Automation(this, 1, multiplier);
         _addend = new Automation(this, 2, addend);

@@ -5,7 +5,7 @@ namespace SynthesizerLibrary.DSP;
 
 public class UpMixer : AudioNode
 {
-    public UpMixer(IAudioProvider provider) : base(provider, 1, 1)
+    public UpMixer(IAudioProvider provider) : base(provider, 1, 1, "UpMixer")
     {
         Outputs[0].Channels = provider.Channels;
     }

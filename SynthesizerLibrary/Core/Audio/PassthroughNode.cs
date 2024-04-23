@@ -5,8 +5,8 @@ namespace SynthesizerLibrary.Core.Audio;
 
 public class PassThroughNode : AudioNode
 {
-    public PassThroughNode(IAudioProvider provider, int numberOfInputs, int numberOfOutputs) 
-        : base(provider, numberOfInputs, numberOfOutputs)
+    public PassThroughNode(IAudioProvider provider, int numberOfInputs, int numberOfOutputs, string name) 
+        : base(provider, numberOfInputs, numberOfOutputs, name)
     {
         IsVirtual = true;
     }
@@ -27,37 +27,38 @@ public class PassThroughNode : AudioNode
 
     protected override void MigrateOutputSamples()
     {
-        var numberOfOutputs = Outputs.Count;
-        for (var i = 0; i < numberOfOutputs; i++)
-        {
-            var input = Inputs[i];
-            var output = Outputs[i];
+        base.MigrateOutputSamples();
+        //var numberOfOutputs = Outputs.Count;
+        //for (var i = 0; i < numberOfOutputs; i++)
+        //{
+        //    var input = Inputs[i];
+        //    var output = Outputs[i];
 
-            if (input.Samples.Count != 0)
-            {
-                output.Samples = input.Samples;
-            }
-            else
-            {
-                var numberOfChannels = output.Channels;
-                if (output.Samples.Count == numberOfChannels)
-                {
-                    continue;
-                }
+        //    if (input.Samples.Count != 0)
+        //    {
+        //        output.Samples = input.Samples;
+        //    }
+        //    else
+        //    {
+        //        var numberOfChannels = output.Channels;
+        //        if (output.Samples.Count == numberOfChannels)
+        //        {
+        //            continue;
+        //        }
 
-                if (output.Samples.Count > numberOfChannels)
-                {
-                    output.Samples.RemoveRange(numberOfChannels, output.Samples.Count - numberOfChannels);
-                    continue;
+        //        if (output.Samples.Count > numberOfChannels)
+        //        {
+        //            output.Samples.RemoveRange(numberOfChannels, output.Samples.Count - numberOfChannels);
+        //            continue;
 
-                }
+        //        }
 
-                for (var j = output.Samples.Count; j < numberOfChannels; j++)
-                {
-                    output.Samples.Add(0);
-                }
-            }
+        //        for (var j = output.Samples.Count; j < numberOfChannels; j++)
+        //        {
+        //            output.Samples.Add(0);
+        //        }
+        //    }
 
-        }
+        //}
     }
 }

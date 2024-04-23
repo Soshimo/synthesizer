@@ -25,7 +25,7 @@ public class Envelope : AudioNode
     private bool _gateOn;
 
     public event EventHandler<EventArgs>? Complete; 
-    protected Envelope(IAudioProvider provider, IList<double> levels, IList<double> times, double? gate, int? releaseStage = null ) : base(provider, 1, 1)
+    protected Envelope(IAudioProvider provider, IList<double> levels, IList<double> times, double? gate, int? releaseStage = null ) : base(provider, 1, 1, "Envelope")
     {
         Gate = new Automation(this, 0, gate ?? 1);
 

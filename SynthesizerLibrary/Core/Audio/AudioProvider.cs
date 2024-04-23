@@ -9,9 +9,13 @@ public class AudioProvider : WaveProvider32, IAudioProvider
     private readonly AudioDevice _device;
     private readonly DestinationNode _destinationNode;
 
+    public Scheduler Scheduler { get; private set; }
+
     public AudioProvider()
     {
         _device = new AudioDevice(this);
+        Scheduler = new Scheduler(this);
+
         _destinationNode = new DestinationNode(this, _device);
     }
 
