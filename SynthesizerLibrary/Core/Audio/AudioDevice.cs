@@ -1,13 +1,14 @@
-﻿using SythesizerLibrary.Core.Audio.Interface;
+﻿using SynthesizerLibrary.Core.Audio;
+using SythesizerLibrary.Core.Audio.Interface;
 
 namespace SythesizerLibrary.Core.Audio;
 
-public class Device : AudioNode
+public class AudioDevice : AudioNode
 {
     private List<IAudioNode> _nodes;
     private int _writePosition = 0;
 
-    public Device(IAudioProvider provider) : base(provider, 1, 0)
+    public AudioDevice(IAudioProvider provider) : base(provider, 1, 0, "AudioDevice")
     {
         _nodes = new List<IAudioNode>();
     }

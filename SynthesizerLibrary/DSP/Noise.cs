@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using SynthesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
 
@@ -27,7 +28,7 @@ public sealed class Noise : AudioNode
         }
     }
 
-    public Noise(IAudioProvider provider, NoiseColor color = NoiseColor.White) : base(provider, 0, 1)
+    public Noise(IAudioProvider provider, NoiseColor color = NoiseColor.White) : base(provider, 0, 1, "Noise")
     {
         _random = new Random();
         Color = color;

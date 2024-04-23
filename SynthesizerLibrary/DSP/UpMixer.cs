@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SythesizerLibrary.Core.Audio;
+﻿using SynthesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
 
-namespace SythesizerLibrary.DSP;
+namespace SynthesizerLibrary.DSP;
 
 public class UpMixer : AudioNode
 {
-    public UpMixer(IAudioProvider provider) : base(provider, 1, 1)
+    public UpMixer(IAudioProvider provider) : base(provider, 1, 1, "UpMixer")
     {
         Outputs[0].Channels = provider.Channels;
     }

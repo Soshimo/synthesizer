@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SynthesizerLibrary.Core.Audio;
+﻿using SythesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
 
-namespace SythesizerLibrary.Core.Audio;
+namespace SynthesizerLibrary.Core.Audio;
 
 public class AudioNode : IAudioNode
 {
@@ -22,6 +16,156 @@ public class AudioNode : IAudioNode
 
     protected bool IsVirtual { get; init; }
 
+    public bool IsAggregate { get; }
+    public bool NeedsTraverse { get; set; }
+
+    protected string name;
+
+    public int GetWriteTime()
+    {
+        throw new NotImplementedException();
+    }
+
+    protected AudioNode(IAudioProvider provider, int numberOfInputs, int numberOfOutputs, string name, bool isAggregate = false)
+    {
+        this.name = name;
+
+        AudioProvider = provider;
+
+        Inputs = new List<IChannel>();
+        for (var i = 0; i < numberOfInputs; i++)
+        {
+            Inputs.Add(new InputChannel(this, i));
+        }
+
+        Outputs = new List<IChannel>();
+        for (var i = 0; i < numberOfOutputs; i++)
+        {
+            Outputs.Add(new OutputChannel(this, i));
+        }
+
+        InputPassThroughNodes = new List<IAudioNode>();
+        OutputPassThroughNodes = new List<IAudioNode>();
+
+        IsAggregate = isAggregate;
+
+        if (!IsAggregate) return;
+
+        // If we are an aggregate we need to create some virtual nodes
+        // for the pass through nodes
+        for (var i = 0; i < numberOfInputs; i++)
+        {
+            var passthrough = new PassThroughNode(AudioProvider, 1, 1, name);
+            InputPassThroughNodes.Add(passthrough);
+        }
+
+        for (var i = 0; i < numberOfOutputs; i++)
+        {
+            OutputPassThroughNodes.Add(new PassThroughNode(AudioProvider, 1, 1, name));
+        }
+    }
+
+    public virtual void Connect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
+    {
+        if (node.IsAggregate)
+        {
+            node = node.InputPassThroughNodes[inputIndex];
+            inputIndex = 0;
+
+        }
+
+        var inputPin = node.Inputs[inputIndex];
+        var outputPin = IsAggregate ? OutputPassThroughNodes[outputIndex].Outputs[0] : Outputs[outputIndex];
+
+        outputPin.Connect(inputPin);
+        inputPin.Connect(outputPin);
+
+        AudioProvider.NeedTraverse = true;
+    }
+
+    public virtual void Disconnect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
+    {
+        if (node.IsAggregate)
+        {
+            node = node.InputPassThroughNodes[inputIndex];
+            inputIndex = 0;
+        }
+
+        var inputPin = node.Inputs[inputIndex];
+        var outputPin = IsAggregate ? OutputPassThroughNodes[outputIndex].Outputs[0] : Outputs[outputIndex];
+
+        inputPin.Disconnect(outputPin);
+        outputPin.Disconnect(inputPin);
+
+
+        AudioProvider.NeedTraverse = true;
+    }
+
+    public virtual void Tick()
+    {
+        MigrateInputSamples();
+        MigrateOutputSamples();
+
+        GenerateMix();
+    }
+
+    protected virtual void MigrateOutputSamples()
+    {
+        var numberOfOutputs = Outputs.Count;
+
+        for (var i = 0; i < numberOfOutputs; i++)
+        {
+            var output = Outputs[i];
+            var numberOfChannels = output.Channels;
+
+
+            if (output.Samples.Count < numberOfChannels)
+            {
+                for (int j = output.Samples.Count; j < numberOfChannels; j++)
+                {
+                    output.Samples.Add(0);
+                }
+            }
+            else if (output.Samples.Count > numberOfChannels)
+            {
+                output.Samples.RemoveRange(numberOfChannels, output.Samples.Count - numberOfChannels);
+            }
+        }
+    }
+
+
+
+    protected virtual void MigrateInputSamples()
+    {
+        foreach (var input in Inputs)
+        {
+            var numberOfConnectedInputChannels = 0;
+
+            input.Samples.Clear();
+
+            foreach (var output in input.Connected)
+            {
+                for (var k = 0; k < output.Samples.Count; k++)
+                {
+                    var sample = output.Samples[k];
+                    if (k < numberOfConnectedInputChannels)
+                    {
+                        input.Samples[k] += sample;
+                    }
+                    else
+                    {
+                        input.Samples.Add(sample);
+                        numberOfConnectedInputChannels++;
+                    }
+                }
+            }
+
+            if (input.Samples.Count > numberOfConnectedInputChannels)
+            {
+                input.Samples.RemoveRange(numberOfConnectedInputChannels, input.Samples.Count - numberOfConnectedInputChannels);
+            }
+        }
+    }
     public void Remove()
     {
         // Disconnect inputs
@@ -54,196 +198,7 @@ public class AudioNode : IAudioNode
             passThrough.Remove();
         }
     }
-
-    public bool IsAggregate { get; }
-    public bool NeedsTraverse { get; set; }
-
-    public int GetWriteTime()
-    {
-        throw new NotImplementedException();
-    }
-
-    protected AudioNode(IAudioProvider provider, int numberOfInputs, int numberOfOutputs, bool isAggregate = false)
-    {
-        AudioProvider = provider;
-
-        Inputs = new List<IChannel>();
-        for (var i = 0; i < numberOfInputs; i++)
-        {
-            Inputs.Add(new InputChannel(this, i));
-        }
-
-        Outputs = new List<IChannel>();
-        for (var i = 0; i < numberOfOutputs; i++)
-        {
-            Outputs.Add(new OutputChannel(this, i));
-        }
-
-        InputPassThroughNodes = new List<IAudioNode>();
-        OutputPassThroughNodes = new List<IAudioNode>();
-
-        IsAggregate = isAggregate;
-
-        if (!IsAggregate) return;
-
-        // If we are an aggregate we need to create some virtual nodes
-        // for the pass through nodes
-        for (var i = 0; i < numberOfInputs; i++)
-        {
-            InputPassThroughNodes.Add(new AudioNode(AudioProvider, 1, 1){ IsVirtual = true });
-        }
-
-        for (var i = 0; i < numberOfOutputs; i++)
-        {
-            OutputPassThroughNodes.Add(new AudioNode(AudioProvider, 1, 1) { IsVirtual = true });
-        }
-    }
-
-    public virtual void Connect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
-    {
-        if (IsAggregate)
-        {
-            var psNode = OutputPassThroughNodes[outputIndex];
-            psNode.Connect(node, inputIndex, 0);
-        }
-        else
-        {
-            var inputPin = node.IsAggregate ? node.InputPassThroughNodes[inputIndex].Inputs[0] : node.Inputs[inputIndex];
-            var outputPin = Outputs[outputIndex];
-
-            outputPin.Connect(inputPin);
-            inputPin.Connect(outputPin);
-        }
-
-        AudioProvider.NeedTraverse = true;
-    }
-
-    public virtual void Disconnect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
-    {
-        if (IsAggregate)
-        {
-            OutputPassThroughNodes[outputIndex].Disconnect(node,  inputIndex, 0);
-        }
-        else
-        {
-            var inputPin = node.IsAggregate ? node.InputPassThroughNodes[inputIndex].Inputs[0] : node.Inputs[inputIndex];
-            var outputPin = Outputs[outputIndex];
-
-            inputPin.Disconnect(outputPin);
-            outputPin.Disconnect(inputPin);
-        }
-
-        AudioProvider.NeedTraverse = true;
-    }
-
-    public void Tick()
-    {
-        MigrateInputSamples();
-        MigrateOutputSamples();
-
-        GenerateMix();
-    }
-
-    private void MigrateOutputSamples()
-    {
-        if (IsVirtual)
-        {
-            CreateVirtualOutputSamples();
-            return;
-        }
-
-        foreach (var output in Outputs)
-        {
-
-            output.Samples.Clear();
-            var numberOfConnectedChannels = output.Channels;
-            if (output.Samples.Count == numberOfConnectedChannels)
-            {
-                continue;
-            }
-
-            if (output.Samples.Count > numberOfConnectedChannels)
-            {
-                output.Samples.RemoveRange(numberOfConnectedChannels, output.Samples.Count - numberOfConnectedChannels);
-                continue;
-            }
-
-            for (var j = output.Samples.Count; j < numberOfConnectedChannels; j++)
-            {
-                output.Samples.Add(0);
-            }
-        }
-    }
-
-    private void CreateVirtualOutputSamples()
-    {
-        var numberOfOutputs = Outputs.Count;
-        for (var i = 0; i < numberOfOutputs; i++)
-        {
-            var input = Inputs[i];
-            var output = Outputs[i];
-
-            if (input.Samples.Count != 0)
-            {
-                output.Samples = input.Samples;
-            }
-            else
-            {
-                var numberOfChannels = output.Channels;
-                if (output.Samples.Count == numberOfChannels)
-                {
-                    continue;
-                }
-
-                if (output.Samples.Count > numberOfChannels)
-                {
-                    output.Samples.RemoveRange(numberOfChannels, output.Samples.Count - numberOfChannels);
-                    continue;
-
-                }
-
-                for (var j = output.Samples.Count; j < numberOfChannels; j++)
-                {
-                    output.Samples.Add(0);
-                }
-            }
-      
-        }
-    }
-
-    public void MigrateInputSamples()
-    {
-        foreach (var input in Inputs)
-        {
-            var numberOfConnectedInputChannels = 0;
-
-            input.Samples.Clear();
-
-            foreach (var output in input.Connected)
-            {
-                for (var k = 0; k < output.Samples.Count; k++)
-                {
-                    var sample = output.Samples[k];
-                    if (k < numberOfConnectedInputChannels)
-                    {
-                        input.Samples[k] += sample;
-                    }
-                    else
-                    {
-                        input.Samples.Add(sample);
-                        numberOfConnectedInputChannels++;
-                    }
-                }
-            }
-
-            if (input.Samples.Count > numberOfConnectedInputChannels)
-            {
-                input.Samples.RemoveRange(numberOfConnectedInputChannels, input.Samples.Count - numberOfConnectedInputChannels);
-            }
-        }
-    }
-
-    public List<IAudioNode> Traverse(List<IAudioNode> nodes)
+    public virtual List<IAudioNode> Traverse(List<IAudioNode> nodes)
     {
         if (nodes.Contains(this)) return nodes;
 
@@ -251,17 +206,29 @@ public class AudioNode : IAudioNode
         nodes = TraverseParents(nodes);
         return nodes;
     }
-
-    private List<IAudioNode> TraverseParents(List<IAudioNode> nodes)
+    protected virtual List<IAudioNode> TraverseParents(List<IAudioNode> nodes)
     {
-        return Inputs
-            .SelectMany(input => input.Connected)
-            .Aggregate(nodes, (current, stream) => stream.Node.Traverse(current));
+        var current = nodes;
+
+        // First, loop through each input
+        foreach (var inputChannel in Inputs)
+        {
+            // Then loop through each 'Connected' entry in the current input
+            foreach (var outputChannel in inputChannel.Connected)
+            {
+                // Perform the 'Traverse' method on the node of the current stream,
+                // and update 'current' with the result
+                current = outputChannel.Node.IsAggregate ? outputChannel.Node.OutputPassThroughNodes[outputChannel.Index].Traverse(current) : outputChannel.Node.Traverse(current);
+            }
+        }
+
+        // Return the final collection of nodes after traversal
+        return current;
+
     }
 
     protected virtual void GenerateMix()
     {
-
     }
 
     protected void SetNumberOfOutputChannels(int output, int numberOfChannels)

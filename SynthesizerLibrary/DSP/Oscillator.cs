@@ -1,8 +1,9 @@
-﻿using SythesizerLibrary.Core;
-using SythesizerLibrary.Core.Audio;
+﻿using SynthesizerLibrary.Core;
+using SynthesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
+using SythesizerLibrary.DSP;
 
-namespace SythesizerLibrary.DSP;
+namespace SynthesizerLibrary.DSP;
 
 public class Oscillator : AudioNode
 {
@@ -14,10 +15,12 @@ public class Oscillator : AudioNode
 
     private WaveShape _waveShape;
 
-    public Oscillator(IAudioProvider provider, float frequency = 440f, WaveShape waveShape = WaveShape.Sine, float pulseWidth = 0.5f) : base(provider, 2, 1)
+    public Oscillator(IAudioProvider provider, float frequency = 440f, WaveShape waveShape = WaveShape.Sine, float pulseWidth = 0.5f) : base(provider, 2, 1, "Oscillator")
     {
         _frequency = new Automation(this, 0, frequency);
         _pulseWidth = new Automation(this, 1, pulseWidth);
+
+        _waveShape = waveShape;
 
         _phase = 0.0;
         _p = 0.0;

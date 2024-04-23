@@ -1,21 +1,25 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using SynthesizerLibrary.Core;
+using SynthesizerLibrary.Core.Audio;
 using SynthesizerLibrary.DSP;
 using SynthesizerLibrary.Util;
+using SythesizerLibrary.Core;
 using SythesizerLibrary.Core.Audio;
 using SythesizerLibrary.Core.Audio.Interface;
 using SythesizerLibrary.DSP;
 using SythesizerLibrary.Operators;
 using SythesizerLibrary.Scale;
 using SythesizerLibrary.Tuning;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 var audioProvider = new WasapiAudioProvider();
 
-//var minorKeyOfBFlat = new MinorScale("Bb", new WesternTuning());  // 2^(n/12)
+var minorKeyOfBFlat = new MinorScale("Bb", new WesternTuning());  // 2^(n/12)
 
-//var foo = (float)minorKeyOfBFlat.GetFrequency(0, 3);
-//var bar = (float)minorKeyOfBFlat.GetFrequency(4, 3);
+var foo = (float)minorKeyOfBFlat.GetFrequency(0, 3);
+var bar = (float)minorKeyOfBFlat.GetFrequency(4, 3);
 
 //var osc1 = new Oscillator(audioProvider, foo, WaveShape.Sawtooth);
 //var oscGain = new Gain(audioProvider, 1);
@@ -50,21 +54,32 @@ var audioProvider = new WasapiAudioProvider();
 
 //osc3.Connect(osc2, 1);
 
+//var lfo = new Oscillator(audioProvider, 2f);
+//var mulAdd = new MulAdd(audioProvider, 100, foo);
+//lfo.Connect(mulAdd);
+
+
+//var mulAdd2 = new MulAdd(audioProvider, 100, bar);
+//lfo.Connect(mulAdd2);
+
 var oscGain = new Gain(audioProvider);
-var voice = new Voice(audioProvider);
+var voice = new SynthVoice(audioProvider, foo, bar);
+//var lfo = new Oscillator(audioProvider, 2f);
+//var mulAdd = new MulAdd(audioProvider, 100, foo);
+
+//lfo.Connect(mulAdd);
+//mulAdd.Connect(voice);
+
+var frequencyAutomationNode = new AutomationNode(audioProvider, foo);
+frequencyAutomationNode.Connect(voice);
+
 voice.Connect(oscGain);
-
-//var gain2 = new Gain(audioProvider);
-//osc2.Connect(gain2);
-
 audioProvider.ConnectToOutput(oscGain);
-
 audioProvider.Play();
 
-
-//env.Gate.SetValue(1);
-//Thread.Sleep(250);
-//env.Gate.SetValue(0);
+voice.NoteOn();
+Thread.Sleep(250);
+voice.NoteOff();
 
 var exit = false;
 while (!exit)
@@ -78,41 +93,97 @@ while (!exit)
             case ConsoleKey.Escape:
                 exit = true;
                 break;
+
+            case ConsoleKey.A:
+                frequencyAutomationNode.Value.SetValue(440.0);
+                voice.NoteOn();
+                Thread.Sleep(250);
+                voice.NoteOff();
+                break;
+
+            case ConsoleKey.B:
+                var (index, octave) = NoteHelper.ParseNoteString("Bb4");
+                frequencyAutomationNode.Value.SetValue(NoteHelper.NoteToFrequency(index, octave, 27.5));
+                voice.NoteOn();
+                Thread.Sleep(250);
+                voice.NoteOff();
+                break;
         }
     }
 }
 
 
-
-
-public class Voice : AudioNode
+class SynthVoice : GroupNode
 {
-    private Gain oscGain;
-    private Oscillator lfo;
-    
-    public Voice(IAudioProvider provider) : base(provider, 1, 1, true)
+    private ADSREnvelope _envelope;
+
+    public SynthVoice(IAudioProvider provider, float frequency1, float frequency2) : base(provider, 5, 1, "SynthVoice")
     {
-        var osc = new Oscillator(provider);
-        oscGain = new Gain(provider, .5);
+        var osc1 = new Oscillator(provider, frequency1, WaveShape.Sine);
+        //var osc2 = new Oscillator(provider, frequency2, WaveShape.Sawtooth);
+
+        var mixer = new Mixer(provider, 2);
+
+        //osc1.Connect(mixer);
+        //osc2.Connect(mixer, 1);
+
+        // TODO: get values from voice constructor
+        _envelope = new ADSREnvelope(provider, 0, .7, 1, .75, 1.5);
+
+        var osc1Gain = new Gain(provider, 0.5);
+        var osc2Gain = new Gain(provider, 0.5);
+        var masterGain = new Gain(provider);
+
+        InputPassThroughNodes[0].Connect(osc1);
+        //InputPassThroughNodes[1].Connect(osc2);
+
+        osc1.Connect(osc1Gain);
+        //osc2.Connect(osc2Gain);
+
+        _envelope.Connect(osc1Gain, 1);
+        _envelope.Connect(osc2Gain, 1);
+
+        osc1Gain.Connect(mixer, 0);
+        osc2Gain.Connect(mixer, 1);
+
+        mixer.Connect(masterGain);
+
+        //var lfo = new Oscillator(provider, 2f);
+
+        //var mulAdd = new MulAdd(provider, 100, frequency1);
+        //lfo.Connect(mulAdd);
+
+        //var mulAdd2 = new MulAdd(provider, 100, frequency2);
+        //lfo.Connect(mulAdd2);
+
+        //mulAdd.Connect(osc1);
+        //mulAdd2.Connect(osc2);
+
+        // input drives => automationpassthorugh => automation
+        // automationpassthrough will have automation in constructor
+        // automationpassthrough will set the automation value in the getmix
 
 
-        osc.Connect(oscGain);
-        oscGain.Connect(OutputPassThroughNodes[0]);
-
-        lfo = new Oscillator(provider, 2f);
-
-        var multiAdd = new MulAdd(provider, .2, .5);
-        lfo.Connect(multiAdd);
-
-        multiAdd.Connect(osc, 1);
-        //lfo.Connect(osc, 1);
-        
-        //osc.Connect(oscGain);
-
-        //lfo.Connect(oscGain, 1);
-
-        oscGain.Connect(OutputPassThroughNodes[0]);
+        masterGain.Connect(OutputPassThroughNodes[0]);
     }
 
+    public void NoteOn()
+    {
+        _envelope.Gate.SetValue(1);
+    }
+
+    public void NoteOff()
+    {
+        _envelope.Gate.SetValue(0);
+    }
+
+    protected override void GenerateMix()
+    {
+        // TODO create a passthrough automation node to link one input to another input in the group
+        // for now we will do it manually
+        //_automationNode.Value.SetValue(Frequency);
+
+        base.GenerateMix();
+    }
 }
 

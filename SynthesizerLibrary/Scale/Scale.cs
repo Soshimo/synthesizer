@@ -18,20 +18,8 @@ public class Scale
             throw new ArgumentException($"Invalid root note: {rootNote}");
         }
 
-        // Default octave adjustment based on the tuning system's starting note
-        //int octaveAdjustment = 0;
-
-        //// Special case for flats that technically belong to the previous octave
-        //if (rootNote.EndsWith("b") && rootNote.StartsWith("A"))
-        //{
-        //    octaveAdjustment = -1;
-        //}
-
         // Use the count of Ratios to determine the number of semitones per octave in the tuning system
         var semitonesPerOctave = _tuning.Ratios.Count;
-
-        // Adjust keyIndex for flats to ensure they are correctly placed within the octave cycle
-        // rootNoteIndex += semitonesPerOctave; // * octaveAdjustment;
 
         // Adjust the key index based on the semitones per octave to ensure it wraps correctly
         rootNoteIndex %= semitonesPerOctave;
@@ -44,6 +32,7 @@ public class Scale
     {
         _degrees = degrees;
         _tuning = tuning;
+
         // Use the count of Ratios to determine the number of semitones per octave in the tuning system
         var semitonesPerOctave = _tuning.Ratios.Count;
         // Adjust the key index based on the semitones per octave to ensure it wraps correctly

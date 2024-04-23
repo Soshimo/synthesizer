@@ -1,7 +1,6 @@
-﻿using SythesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
+﻿using SythesizerLibrary.Core.Audio.Interface;
 
-namespace SythesizerLibrary.Core;
+namespace SynthesizerLibrary.Core;
 
 
 public class Automation
@@ -9,6 +8,7 @@ public class Automation
     private readonly IChannel? _inputChannel;
     private double _value;
 
+    public event EventHandler<ValueChangedEventArgs> ValueChanged;
     public Automation(IAudioNode node, int? inputIndex = null, double value = 0)
     {
         _inputChannel = inputIndex.HasValue ? node.Inputs[inputIndex.Value] : null;
@@ -27,6 +27,7 @@ public class Automation
 
     public void SetValue(double value)
     {
+        OnValueChanged(new ValueChangedEventArgs(_value, value));
         _value = value;
     }
 
@@ -40,4 +41,20 @@ public class Automation
         return automation.GetValue();
     }
 
+    protected virtual void OnValueChanged(ValueChangedEventArgs e)
+    {
+        ValueChanged?.Invoke(this, e);
+    }
+}
+
+public class ValueChangedEventArgs : EventArgs
+{
+    public double OldValue;
+    public double NewValue;
+
+    public ValueChangedEventArgs(double oldValue, double newValue)
+    {
+        OldValue = oldValue;
+        NewValue = newValue;
+    }
 }
