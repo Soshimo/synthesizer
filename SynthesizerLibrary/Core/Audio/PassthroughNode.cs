@@ -11,7 +11,6 @@ public class PassThroughNode : AudioNode
         IsVirtual = true;
     }
 
-
     // Copy input samples directly to output samples
     protected override void GenerateMix()
     {
@@ -25,40 +24,4 @@ public class PassThroughNode : AudioNode
         }
     }
 
-    protected override void MigrateOutputSamples()
-    {
-        base.MigrateOutputSamples();
-        //var numberOfOutputs = Outputs.Count;
-        //for (var i = 0; i < numberOfOutputs; i++)
-        //{
-        //    var input = Inputs[i];
-        //    var output = Outputs[i];
-
-        //    if (input.Samples.Count != 0)
-        //    {
-        //        output.Samples = input.Samples;
-        //    }
-        //    else
-        //    {
-        //        var numberOfChannels = output.Channels;
-        //        if (output.Samples.Count == numberOfChannels)
-        //        {
-        //            continue;
-        //        }
-
-        //        if (output.Samples.Count > numberOfChannels)
-        //        {
-        //            output.Samples.RemoveRange(numberOfChannels, output.Samples.Count - numberOfChannels);
-        //            continue;
-
-        //        }
-
-        //        for (var j = output.Samples.Count; j < numberOfChannels; j++)
-        //        {
-        //            output.Samples.Add(0);
-        //        }
-        //    }
-
-        //}
-    }
 }

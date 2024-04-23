@@ -65,7 +65,7 @@ var bar = (float)minorKeyOfBFlat.GetFrequency(4, 3);
 var oscGain = new Gain(audioProvider);
 var voice = new SynthVoice(audioProvider, foo, bar);
 //var lfo = new Oscillator(audioProvider, 2f);
-var mulAdd = new MulAdd(audioProvider, 100, foo);
+//var mulAdd = new MulAdd(audioProvider, 100, foo);
 
 //lfo.Connect(mulAdd);
 //mulAdd.Connect(voice);

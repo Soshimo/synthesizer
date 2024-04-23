@@ -69,18 +69,12 @@ public class AudioNode : IAudioNode
     {
         if (node.IsAggregate)
         {
-            //var psNode = node.InputPassThroughNodes[inputIndex].Inputs[0];
-
-            //var outputNode = IsAggregate ? OutputPassThroughNodes[outputIndex].Outputs[0] : Outputs[outputIndex];
-            //psNode.Connect(outputNode);
-            //outputNode.Connect(psNode);
-
             node = node.InputPassThroughNodes[inputIndex];
             inputIndex = 0;
 
         }
 
-        var inputPin = node.Inputs[inputIndex]; //node.IsAggregate ? node.InputPassThroughNodes[inputIndex].Inputs[0] : node.Inputs[inputIndex];
+        var inputPin = node.Inputs[inputIndex];
         var outputPin = IsAggregate ? OutputPassThroughNodes[outputIndex].Outputs[0] : Outputs[outputIndex];
 
         outputPin.Connect(inputPin);
@@ -93,8 +87,6 @@ public class AudioNode : IAudioNode
     {
         if (node.IsAggregate)
         {
-            //OutputPassThroughNodes[outputIndex].Disconnect(node, inputIndex, 0);
-
             node = node.InputPassThroughNodes[inputIndex];
             inputIndex = 0;
         }
@@ -216,12 +208,6 @@ public class AudioNode : IAudioNode
     }
     protected virtual List<IAudioNode> TraverseParents(List<IAudioNode> nodes)
     {
-        //var inputs = IsAggregate ? InputPassThroughNodes[0].Inputs : Inputs;
-
-        //return inputs
-        //    .SelectMany(input => input.Connected)
-        //    .Aggregate(nodes, (current, stream) => stream.Node.Traverse(current));
-        // Assuming 'nodes' is the initial collection of nodes
         var current = nodes;
 
         // First, loop through each input

@@ -10,12 +10,6 @@ public sealed class DestinationNode : GroupNode
     public DestinationNode(AudioProvider provider, AudioDevice device) : base(provider, 1, 0, "DestinationNode")
     {
         var mixer = new UpMixer(provider);
-
-        //var scheduler = new Scheduler(provider);
-
-        // connect our input to scheduler
-        //Connect(scheduler);
-
         var scheduler = provider.Scheduler;
 
         InputPassThroughNodes[0].Connect(scheduler, 0, 0);
