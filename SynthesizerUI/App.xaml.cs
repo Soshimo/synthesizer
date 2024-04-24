@@ -5,6 +5,7 @@ using System.Data;
 using System.Windows;
 using System.Windows.Navigation;
 using Microsoft.Extensions.DependencyInjection;
+using SynthesizerUI.Services;
 
 namespace SynthesizerUI
 {

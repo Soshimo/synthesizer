@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SynthesizerUI.Services;
 
 namespace SynthesizerUI.ViewModel;
 

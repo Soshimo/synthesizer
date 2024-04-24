@@ -3,7 +3,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
 
-namespace SynthesizerUI;
+namespace SynthesizerUI.DependencyObjects;
 
 public class SpriteSheet : DependencyObject
 {
@@ -68,7 +68,7 @@ public class SpriteSheet : DependencyObject
 
 
         var start = Range?.Start ?? 0;
-        var end = Range?.End ?? (Cells - 1);
+        var end = Range?.End ?? Cells - 1;
 
         for (var i = start; i <= end; i++)
         {

@@ -5,8 +5,8 @@ namespace SynthesizerLibrary.Core.Audio;
 
 public class PassThroughNode : AudioNode
 {
-    public PassThroughNode(IAudioProvider provider, int numberOfInputs, int numberOfOutputs, string name) 
-        : base(provider, numberOfInputs, numberOfOutputs, name)
+    public PassThroughNode(IAudioProvider provider, int numberOfInputs, int numberOfOutputs) 
+        : base(provider, numberOfInputs, numberOfOutputs)
     {
         IsVirtual = true;
     }

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SynthesizerUI" xmlns:viewmodel="clr-namespace:SynthesizerUI.ViewModel"
         xmlns:converters="clr-namespace:SynthesizerUI.Converters"
+        xmlns:dependencyObjects="clr-namespace:SynthesizerUI.DependencyObjects"
         d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowViewModel}"
         KeyDown="Window_KeyDown" KeyUp="Window_KeyUp"
         mc:Ignorable="d"
@@ -112,11 +113,11 @@
                             Width="64" 
                             Height="64">
                             <local:KnobControl.SpriteSheet>
-                                <local:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
-                                    <local:SpriteSheet.Range>
-                                        <local:IntegerRange End="100" />
-                                    </local:SpriteSheet.Range>
-                                </local:SpriteSheet>
+                                <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
+                                    <dependencyObjects:SpriteSheet.Range>
+                                        <dependencyObjects:IntegerRange End="100" />
+                                    </dependencyObjects:SpriteSheet.Range>
+                                </dependencyObjects:SpriteSheet>
                             </local:KnobControl.SpriteSheet>
                         </local:KnobControl>
                     </StackPanel>

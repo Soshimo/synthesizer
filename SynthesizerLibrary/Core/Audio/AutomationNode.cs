@@ -6,7 +6,7 @@ public class AutomationNode : AudioNode
 {
     public Automation Value { get; }
     public AutomationNode(IAudioProvider provider, double value = 0) 
-        : base(provider, 1, 1, "AutomationNode")
+        : base(provider, 1, 1)
     {
         Value = new Automation(this, 0, value);
     }

@@ -15,7 +15,7 @@ public class Oscillator : AudioNode
 
     private WaveShape _waveShape;
 
-    public Oscillator(IAudioProvider provider, float frequency = 440f, WaveShape waveShape = WaveShape.Sine, float pulseWidth = 0.5f) : base(provider, 2, 1, "Oscillator")
+    public Oscillator(IAudioProvider provider, float frequency = 440f, WaveShape waveShape = WaveShape.Sine, float pulseWidth = 0.5f) : base(provider, 2, 1)
     {
         _frequency = new Automation(this, 0, frequency);
         _pulseWidth = new Automation(this, 1, pulseWidth);

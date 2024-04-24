@@ -28,7 +28,7 @@ public sealed class Noise : AudioNode
         }
     }
 
-    public Noise(IAudioProvider provider, NoiseColor color = NoiseColor.White) : base(provider, 0, 1, "Noise")
+    public Noise(IAudioProvider provider, NoiseColor color = NoiseColor.White) : base(provider, 0, 1)
     {
         _random = new Random();
         Color = color;

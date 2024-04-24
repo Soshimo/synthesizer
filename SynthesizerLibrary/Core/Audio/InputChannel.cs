@@ -9,14 +9,14 @@ namespace SynthesizerLibrary.Core.Audio;
 
 public class InputChannel : IChannel
 {
-    public IAudioNode Node { get; }
+    public IAudioNode? Node { get; }
     public int Index { get; }
     public List<IChannel> Connected { get; }
     public int Channels { get; set; }
 
     public List<double> Samples { get; set; }
 
-    public InputChannel(IAudioNode node, int index)
+    public InputChannel(IAudioNode? node, int index)
     {
         Node = node;
         Index = index;

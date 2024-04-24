@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace SynthesizerUI;
+namespace SynthesizerUI.Templates;
 
 public class PianoKeyTemplateSelector : DataTemplateSelector
 {

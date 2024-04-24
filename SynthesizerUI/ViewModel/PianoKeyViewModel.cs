@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SynthesizerUI.Services;
 
 namespace SynthesizerUI.ViewModel;
 
@@ -20,7 +21,11 @@ public class PianoKeyViewModel : ObservableObject
         set => SetProperty(ref _octave, value);
     }
 
-    public string Note { get => _note; set => SetProperty(ref _note, value); }
+    public string Note
+    {
+        get => _note; 
+        set => SetProperty(ref _note, value);
+    }
     public bool IsBlack { get => _isBlack; set => SetProperty(ref _isBlack, value); }
     public Key AssignedKey { get; set; }  // System.Windows.Input.Key enum value
 
@@ -51,7 +56,7 @@ public class PianoKeyViewModel : ObservableObject
         IsPressed = true;
 
         // play sound
-        _synthesizerService.NoteOn(Note);
+        _synthesizerService.NoteOn(Note,  Octave);
     }
 
     private void ExecuteKeyRelease()
@@ -59,6 +64,6 @@ public class PianoKeyViewModel : ObservableObject
         IsPressed = false;
 
         // Stop sound
-        _synthesizerService.NoteOff(Note);
+        _synthesizerService.NoteOff(Note, Octave);
     }
 }

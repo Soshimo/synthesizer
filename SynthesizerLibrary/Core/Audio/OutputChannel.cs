@@ -11,14 +11,14 @@ public class OutputChannel : IChannel
 {
     private int _numberChannels;
 
-    public IAudioNode Node { get; }
+    public IAudioNode? Node { get; }
     public int Index { get; }
     public List<IChannel> Connected { get; }
     public int Channels { get => GetNumberOfChannels(); set => _numberChannels = value; }
     public List<double> Samples { get; set; }
 
 
-    public OutputChannel(IAudioNode node, int index)
+    public OutputChannel(IAudioNode? node, int index)
     {
         Node = node;
         Index = index;

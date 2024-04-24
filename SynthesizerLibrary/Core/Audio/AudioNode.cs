@@ -19,17 +19,13 @@ public class AudioNode : IAudioNode
     public bool IsAggregate { get; }
     public bool NeedsTraverse { get; set; }
 
-    protected string name;
-
     public int GetWriteTime()
     {
         throw new NotImplementedException();
     }
 
-    protected AudioNode(IAudioProvider provider, int numberOfInputs, int numberOfOutputs, string name, bool isAggregate = false)
+    protected AudioNode(IAudioProvider provider, int numberOfInputs, int numberOfOutputs, bool isAggregate = false)
     {
-        this.name = name;
-
         AudioProvider = provider;
 
         Inputs = new List<IChannel>();
@@ -55,13 +51,13 @@ public class AudioNode : IAudioNode
         // for the pass through nodes
         for (var i = 0; i < numberOfInputs; i++)
         {
-            var passthrough = new PassThroughNode(AudioProvider, 1, 1, name);
+            var passthrough = new PassThroughNode(AudioProvider, 1, 1);
             InputPassThroughNodes.Add(passthrough);
         }
 
         for (var i = 0; i < numberOfOutputs; i++)
         {
-            OutputPassThroughNodes.Add(new PassThroughNode(AudioProvider, 1, 1, name));
+            OutputPassThroughNodes.Add(new PassThroughNode(AudioProvider, 1, 1));
         }
     }
 
@@ -71,7 +67,6 @@ public class AudioNode : IAudioNode
         {
             node = node.InputPassThroughNodes[inputIndex];
             inputIndex = 0;
-
         }
 
         var inputPin = node.Inputs[inputIndex];
@@ -137,14 +132,18 @@ public class AudioNode : IAudioNode
 
     protected virtual void MigrateInputSamples()
     {
-        foreach (var input in Inputs)
+        for (var i = 0; i < Inputs.Count; i++)
         {
+            var input = Inputs[i];
+
             var numberOfConnectedInputChannels = 0;
 
             input.Samples.Clear();
 
-            foreach (var output in input.Connected)
+            for (var j = 0; j < input.Connected.Count; j++)
             {
+                var output = input.Connected[j];
+
                 for (var k = 0; k < output.Samples.Count; k++)
                 {
                     var sample = output.Samples[k];

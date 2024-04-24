@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace SynthesizerUI;
+namespace SynthesizerUI.DependencyObjects;
 
 public class IntegerRange : DependencyObject
 {

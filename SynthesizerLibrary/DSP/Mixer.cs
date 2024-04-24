@@ -6,7 +6,7 @@ namespace SynthesizerLibrary.DSP;
 
 public class Mixer : AudioNode
 {
-    public Mixer(IAudioProvider provider, int numberOfInputs) : base(provider, numberOfInputs, 1, "Mixer")
+    public Mixer(IAudioProvider provider, int numberOfInputs) : base(provider, numberOfInputs, 1)
     {
     }
 

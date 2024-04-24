@@ -12,5 +12,5 @@ public interface IAudioProvider
     int Channels { get; }
     int SampleRate { get; }
     int TotalWriteTime { get; }
-    void ConnectToOutput(IAudioNode node);
+    void ConnectToOutput(IAudioNode? node);
 }

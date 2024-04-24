@@ -6,10 +6,10 @@ namespace SynthesizerLibrary.Core.Audio;
 
 public class AudioProvider : WaveProvider32, IAudioProvider
 {
-    private readonly AudioDevice _device;
-    private readonly DestinationNode _destinationNode;
+    private readonly AudioDevice? _device;
+    private readonly DestinationNode? _destinationNode;
 
-    public Scheduler Scheduler { get; private set; }
+    public Scheduler? Scheduler { get; private set; }
 
     public AudioProvider()
     {
@@ -35,7 +35,7 @@ public class AudioProvider : WaveProvider32, IAudioProvider
     public int Channels => WaveFormat.Channels;
     public int SampleRate => WaveFormat.SampleRate;
     public int TotalWriteTime => _device.GetWriteTime();
-    public void ConnectToOutput(IAudioNode node)
+    public void ConnectToOutput(IAudioNode? node)
     {
         node.Connect(_destinationNode, 0, 0);
     }

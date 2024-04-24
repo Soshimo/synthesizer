@@ -19,7 +19,7 @@ public class LP12Filter : AudioNode
     private double _vibraSpeed = 0;
     private double _vibraPos = 0;
 
-    public LP12Filter(IAudioProvider provider, double cutoff = 20000, double resonance = 1) : base(provider, 3, 1, "LP12Filter")
+    public LP12Filter(IAudioProvider provider, double cutoff = 20000, double resonance = 1) : base(provider, 3, 1)
     {
 
         _cutoff = new Automation(this, 1, cutoff);

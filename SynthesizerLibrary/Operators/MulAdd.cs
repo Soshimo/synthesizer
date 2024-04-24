@@ -11,7 +11,7 @@ public class MulAdd : AudioNode
     public readonly Automation Multiplier;
     public readonly Automation Add;
 
-    public MulAdd(IAudioProvider provider, double multiplier = 1, double addend = 0) : base(provider, 3, 1, "MulAdd")
+    public MulAdd(IAudioProvider provider, double multiplier = 1, double addend = 0) : base(provider, 3, 1)
     {
         Multiplier = new Automation(this, 1, multiplier);
         Add = new Automation(this, 2, addend);

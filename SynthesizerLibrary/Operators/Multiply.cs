@@ -10,7 +10,7 @@ public class Multiply : AudioNode
 {
     public readonly Automation Multiplier;
 
-    protected Multiply(IAudioProvider provider, double gain = 1.0) : base(provider, 2, 1, "Multiply")
+    protected Multiply(IAudioProvider provider, double gain = 1.0) : base(provider, 2, 1)
     {
         Multiplier = new Automation(this, 1, gain);
     }

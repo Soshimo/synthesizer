@@ -8,7 +8,7 @@ namespace SythesizerLibrary.Core.Audio.Interface;
 
 public interface IChannel
 {
-    IAudioNode Node { get; }
+    IAudioNode? Node { get; }
     int Index { get; }
     List<IChannel> Connected { get;  }
     int Channels { set; get; }

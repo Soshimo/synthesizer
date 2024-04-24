@@ -17,7 +17,7 @@ public class Scheduler : PassThroughNode
     private double _seconds;
 
     public Scheduler(IAudioProvider provider, double bpm = 120) 
-        : base(provider, 1, 1, "Scheduler")
+        : base(provider, 1, 1)
     {
         _bpm = bpm;
         _queue = new PriorityQueue<AudioEvent?, double>();

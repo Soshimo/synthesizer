@@ -8,7 +8,7 @@ public class AudioDevice : AudioNode
     private List<IAudioNode> _nodes;
     private int _writePosition = 0;
 
-    public AudioDevice(IAudioProvider provider) : base(provider, 1, 0, "AudioDevice")
+    public AudioDevice(IAudioProvider provider) : base(provider, 1, 0)
     {
         _nodes = new List<IAudioNode>();
     }

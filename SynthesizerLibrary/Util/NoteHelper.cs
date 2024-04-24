@@ -43,7 +43,7 @@ public static class NoteHelper
         return (noteIndex, octave);
     }
 
-    public static double NoteToFrequency(int noteIndex, int octave, double referenceFrequency)
+    public static double NoteToFrequency(int noteIndex, int octave, double referenceFrequency = 27.5)
     {
         // Calculate the number of half steps n from A4
         int halfStepsFromA0 = octave * 12 + noteIndex;

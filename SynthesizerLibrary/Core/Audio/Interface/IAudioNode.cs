@@ -11,12 +11,12 @@ public interface IAudioNode
     IList<IChannel> Inputs { get; }
     IList<IChannel> Outputs { get; }
 
-    void Connect(IAudioNode node, int inputIndex = 0, int outputIndex = 0);
-    void Disconnect(IAudioNode node, int output, int input);
+    void Connect(IAudioNode? node, int inputIndex = 0, int outputIndex = 0);
+    void Disconnect(IAudioNode? node, int output, int input);
     void Tick();
     List<IAudioNode> Traverse(List<IAudioNode> nodes);
 
-    List<IAudioNode> InputPassThroughNodes { get; }
+    List<IAudioNode?> InputPassThroughNodes { get; }
     List<IAudioNode> OutputPassThroughNodes { get; set; }
 
     void Remove();
