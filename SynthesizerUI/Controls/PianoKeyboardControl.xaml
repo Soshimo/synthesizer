@@ -10,6 +10,7 @@
              d:DesignHeight="200" d:DesignWidth="600">
 
     <UserControl.Resources>
+
         <DataTemplate x:Key="WhiteKeyTemplate">
             <Button 
                     CommandParameter="{Binding }" 
@@ -28,6 +29,9 @@
                         BorderBrush="{TemplateBinding BorderBrush}" 
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="0,0,5,5">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="3" Direction="315" Color="Black" BlurRadius="5" Opacity="0.5" />
+                            </Border.Effect>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -44,16 +48,15 @@
         </DataTemplate>
         <DataTemplate x:Key="BlackKeyTemplate">
             <Button 
-         
-        CommandParameter="{Binding }" 
-        BorderBrush="Black" 
-        BorderThickness="1" 
-        Background="Black" 
-        Width="30" 
-        Height="100"
-        PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
-        PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
-        >
+                    CommandParameter="{Binding }" 
+                    BorderBrush="Black" 
+                    BorderThickness="1" 
+                    Background="Black" 
+                    Width="30" 
+                    Height="100"
+                    PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown"
+                    PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
+                    >
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="border" 
@@ -61,6 +64,9 @@
                         BorderBrush="{TemplateBinding BorderBrush}" 
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="0,0,5,5">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="3" Direction="315" Color="Black" BlurRadius="5" Opacity="0.5" />
+                            </Border.Effect>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>

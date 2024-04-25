@@ -4,6 +4,11 @@
              xmlns:local="clr-namespace:SynthesizerUI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Shared.xaml" />
+                <ResourceDictionary Source="/Resources/Slider.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -11,6 +11,7 @@ public class VoiceWrapper : IDisposable
     public VoiceWrapper(AudioProvider provider, Voice voice)
     {
         FrequencyAutomationNode = new AutomationNode(provider);
+
         Voice = voice;
         FrequencyAutomationNode.Connect(voice);
     }

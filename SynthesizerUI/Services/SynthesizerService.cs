@@ -11,15 +11,14 @@ public class SynthesizerService : ISynthesizerService
     private readonly Gain _masterGain;
 
     private readonly ObjectPool<Voice, VoiceFactory> _voiceObjectPool;
-
     private readonly Dictionary<string, VoiceWrapper> _voiceDictionary = [];
 
     private const int BaseOctave = 2;
 
     public SynthesizerService()
     {
-        var factory = new VoiceFactory(_audioProvider, new VoiceData(0, .7f, 1.0f, .5f, 1.5f));
-        _voiceObjectPool = new ObjectPool<Voice, VoiceFactory>(factory, 10);
+        var factory = new VoiceFactory(_audioProvider, new VoiceData(0, .1f, .1f, .7f, .1f));
+        _voiceObjectPool = new ObjectPool<Voice, VoiceFactory>(factory, 16);
 
         _masterGain = new Gain(_audioProvider);
 
@@ -27,42 +26,33 @@ public class SynthesizerService : ISynthesizerService
         _audioProvider.Play();
     }
 
-    public void NoteOn(string note, int octave)
+    public void NoteOn(string key, VoiceData voiceData)
     {
-        var noteString = $"{note}{octave + BaseOctave}"; // i.e. C0, or C1
-        if (_voiceDictionary.ContainsKey(noteString)) return;
-
+        if (_voiceDictionary.ContainsKey(key)) return;
+            
         var voiceObject = _voiceObjectPool.GetObject();
-        if(voiceObject == null) return;
-
-        var (index, actualOctave) = NoteHelper.ParseNoteString(noteString);
-        var frequency = NoteHelper.NoteToFrequency(index, actualOctave);
+        if (voiceObject == null) return;
 
         var wrapper = new VoiceWrapper(_audioProvider, voiceObject);
-        _voiceDictionary[noteString] = wrapper;
+        _voiceDictionary[key] = wrapper;
 
-        wrapper.FrequencyAutomationNode.Value.SetValue(frequency);
+        wrapper.FrequencyAutomationNode.Value.SetValue(voiceData.Frequency);
+        wrapper.Voice.SetAttack(voiceData.Attack);
         
         voiceObject.Connect(_masterGain);
         voiceObject.NoteOn();
     }
 
-    public void NoteOff(string note, int octave)
+    public void NoteOff(string noteKey)
     {
-        var noteString = $"{note}{octave + BaseOctave}"; // i.e. C0, or C1
-        if (!_voiceDictionary.ContainsKey(noteString)) return;
+        if (!_voiceDictionary.Remove(noteKey, out var value)) return;
 
-        var voiceObjectWrapper = _voiceDictionary[noteString];
-        _voiceDictionary.Remove(noteString);
-
-        var voiceObject = voiceObjectWrapper.Voice;
+        var voiceObject = value.Voice;
 
         voiceObject.NoteOff();
         voiceObject.VoiceComplete += (sender, args) =>
         {
-            voiceObjectWrapper.Dispose();
-            //voiceObjectWrapper = null;
-
+            value.Dispose();
             voiceObject.Disconnect(_masterGain);
             _voiceObjectPool.ReturnObject(voiceObject);
         };

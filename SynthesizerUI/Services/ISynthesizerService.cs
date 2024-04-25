@@ -1,7 +1,9 @@
-﻿namespace SynthesizerUI.Services;
+﻿using SynthesizerUI.Model;
+
+namespace SynthesizerUI.Services;
 
 public interface ISynthesizerService
 {
-    void NoteOn(string note, int octaveBase);
-    void NoteOff(string note, int octaveBase);
+    void NoteOn(string key, VoiceData data);
+    void NoteOff(string noteKey);
 }

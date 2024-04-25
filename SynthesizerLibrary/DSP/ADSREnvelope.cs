@@ -5,8 +5,17 @@ namespace SynthesizerLibrary.DSP;
 
 public class ADSREnvelope : Envelope
 {
+    private const int AttackIndex = 0;
+    private const int DecayIndex = 1;
+    private const int ReleaseIndex = 2;
+
     public ADSREnvelope(IAudioProvider provider, double gate, double attack, double decay, double sustain, double release) 
         : base(provider, new[] { 0, 1, sustain, 0}, new[]  {attack, decay, release}, gate, 2)
     {
+    }
+
+    public void SetAttack(double value)
+    {
+        _times[AttackIndex] = value;
     }
 }

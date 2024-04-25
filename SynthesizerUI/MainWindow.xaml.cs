@@ -30,17 +30,17 @@ namespace SynthesizerUI
 
         }
 
-        private void Window_KeyUp(object sender, KeyEventArgs e)
-        {
-        }
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-        }
-
         private void CloseApp_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void MainWindow_OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+        }
+
+        private void MainWindow_OnKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
         }
     }
 } 

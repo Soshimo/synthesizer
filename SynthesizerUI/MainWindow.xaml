@@ -7,7 +7,8 @@
         xmlns:converters="clr-namespace:SynthesizerUI.Converters"
         xmlns:dependencyObjects="clr-namespace:SynthesizerUI.DependencyObjects"
         d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowViewModel}"
-        KeyDown="Window_KeyDown" KeyUp="Window_KeyUp"
+        KeyDown="MainWindow_OnKeyDown"
+        KeyUp="MainWindow_OnKeyUp"
         mc:Ignorable="d"
         AllowsTransparency="True"
         WindowStartupLocation="CenterScreen"
@@ -16,6 +17,7 @@
         Title="MainWindow" Height="700" Width="980">
 
     <Window.Resources>
+
         <ImageBrush x:Key="CloseAppDef"
                     ImageSource="/Assets/shutdown_def.png"
                     Stretch="None" />
@@ -79,9 +81,11 @@
             </Setter>
 
         </Style>
+
+        <converters:TickMarkConverter x:Key="TickMarkConverter"></converters:TickMarkConverter>
     </Window.Resources>
     <Grid>
-        <Border Background="#111"
+        <Border Background="#444"
                 CornerRadius="10" />
 
         <!--<Grid.ColumnDefinitions>
@@ -92,26 +96,65 @@
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="250" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="300"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
 
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                </Grid>
+
+                <Border Grid.Row="0" BorderBrush="Black" BorderThickness="2" Width="300" Background="#222">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Attack" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
+
+                        <Slider Grid.Row="1" x:Name="EnvelopeAttack"
+                                Orientation="Vertical"
+                                Height="100"
+                                Margin="0"
+                                LargeChange=".2"
+                                HorizontalAlignment="Center"
+                                TickPlacement="TopLeft"
+                                TickFrequency="1"
+                                Value=".5"
+                                Minimum=".01"
+                                Maximum="10" />
+
+                        <TextBlock Grid.Row="2" 
+                                   Text="{Binding ElementName=EnvelopeAttack, Path=Value, StringFormat={}{0:0.00}}" 
+                                   HorizontalAlignment="Center" 
+                                   Foreground="White" />
+
+                    </Grid>
+                </Border>
+
+                <!--<Grid>
                     <StackPanel>
                         <local:KnobControl 
+
                             VerticalAlignment="Top" 
                             Value="{Binding Path=Value, Mode=TwoWay}" 
-                            Margin="0,20,0,0" 
+                            Margin="20" 
                             Maximum="1200"
                             Minimum="-1200"
                             Step="10"
                             Width="64" 
                             Height="64">
+
                             <local:KnobControl.SpriteSheet>
                                 <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
                                     <dependencyObjects:SpriteSheet.Range>
@@ -119,11 +162,44 @@
                                     </dependencyObjects:SpriteSheet.Range>
                                 </dependencyObjects:SpriteSheet>
                             </local:KnobControl.SpriteSheet>
-                        </local:KnobControl>
-                    </StackPanel>
-                </Grid>
 
-                <local:PianoKeyboardControl Grid.Row="1" Grid.Column="1" PianoKeys="{Binding PianoKeys}"></local:PianoKeyboardControl>
+                        </local:KnobControl>
+
+                        <Border BorderBrush="Black" BorderThickness="2" Width="80" Background="#222">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Attack" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
+
+                            <Slider Grid.Row="1" x:Name="EnvelopeAttack"
+                                    Orientation="Vertical"
+                                    Height="100"
+                                    Margin="0"
+                                    LargeChange=".2"
+                                    HorizontalAlignment="Center"
+                                    TickPlacement="TopLeft"
+                                    TickFrequency=".1"
+                                    Value=".5"
+                                    Minimum="0"
+                                    Maximum="1" />
+
+                            <TextBlock Grid.Row="2" 
+                                       Text="{Binding ElementName=EnvelopeAttack, Path=Value, StringFormat={}{0:0.00}}" 
+                                       HorizontalAlignment="Center" 
+                                       Foreground="White" />
+
+                        </Grid>
+                        </Border>
+                    </StackPanel>
+                </Grid>-->
+
+                <local:PianoKeyboardControl Grid.Column="0" Grid.Row="1" 
+                                            HorizontalAlignment="Center" 
+                                            PianoKeys="{Binding PianoKeys}" />
 
             </Grid>
 

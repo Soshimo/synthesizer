@@ -11,8 +11,8 @@ public class Envelope : AudioNode
 {
     public Automation Gate { get; }
 
-    private readonly IList<double> _levels;
-    private readonly IList<double> _times;
+    protected readonly IList<double> _levels;
+    protected readonly IList<double> _times;
 
     private readonly int? _releaseStage;
 

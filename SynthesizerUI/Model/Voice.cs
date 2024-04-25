@@ -65,4 +65,9 @@ public class Voice : GroupNode, IPoolObject
     {
         VoiceComplete?.Invoke(this, EventArgs.Empty);
     }
+
+    internal void SetAttack(float attack)
+    {
+        _envelope.SetAttack(attack);
+    }
 }
