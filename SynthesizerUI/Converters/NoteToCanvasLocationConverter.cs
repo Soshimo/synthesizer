@@ -12,12 +12,12 @@ public class NoteToCanvasLocationConverter : IMultiValueConverter
 
         var note = (string)values[0];
         var totalWidth = (double)values[1];
-        var octave = (int)values[2];
+        var upperRegister = (bool)values[2];
         var containerWidth = (double)values[3];
         var alignment = (HorizontalAlignment)values[4];
 
         // Calculate the original left position based on the noteAndOctave property
-        var leftPosition = CalculateLeftPositionBasedOnNoteAndOctave(note, octave);
+        var leftPosition = CalculateLeftPositionBasedOnNoteAndOctave(note, upperRegister);
 
         // Calculate the offset based on the alignment
         double offset = 0;
@@ -62,9 +62,10 @@ public class NoteToCanvasLocationConverter : IMultiValueConverter
 
 
 
-    private double CalculateLeftPositionBasedOnNoteAndOctave(string note, int octave)
+    private double CalculateLeftPositionBasedOnNoteAndOctave(string note, bool upperRegister)
     {
 
+        var octave = upperRegister ? 1 : 0;
         double baseOffset = 40 * octave * 7;
 
         if (!_offsetDictionary.TryGetValue(note, out var value))
@@ -75,6 +76,6 @@ public class NoteToCanvasLocationConverter : IMultiValueConverter
 
     private static bool CheckArguments(object[] values)
     {
-        return values is [string, double, int, double, HorizontalAlignment, ..];
+        return values is [string, double, bool, double, HorizontalAlignment, ..];
     }
 }

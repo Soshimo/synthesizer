@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SynthesizerLibrary.Util;
+using SynthesizerUI.Model;
 using SynthesizerUI.Services;
 
 namespace SynthesizerUI.ViewModel;
@@ -17,6 +19,13 @@ public class MainWindowViewModel : ObservableObject
     
     private int _value = 25;
 
+    private int _baseOctave = 2;
+
+    public int BaseOctave
+    {
+        get => _baseOctave;
+        set => SetProperty(ref _baseOctave, value);
+    }
     public int Value
     {
         get => _value;
@@ -77,47 +86,30 @@ public class MainWindowViewModel : ObservableObject
                 AssignedKey = assignedKeyList[i],
                 IsBlack = isBlackList[i],
                 Note = noteList[i],
-                Octave = i < 12 ? 0 : 1
+                UpperRegister = i >= 12
             };
 
-            key.KeyPressed += Key_KeyPressed;
-            key.KeyReleased += Key_KeyReleased;
+            key.KeyPressed += Piano_KeyPressed;
+            key.KeyReleased += Piano_KeyReleased;
 
             PianoKeys.Add(key);
         }
-   
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.A, IsBlack = false, Note = "C", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.W, IsBlack = true, Note = "C#", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.S, IsBlack = false, Note = "D", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.E, IsBlack = true, Note = "D#", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.D, IsBlack = false, Note = "E", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.F, IsBlack = false, Note = "F", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.T, IsBlack = true, Note = "F#", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.G, IsBlack = false, Note = "G", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.Y, IsBlack = true, Note = "G#", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.H, IsBlack = false, Note = "A", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.U, IsBlack = true, Note = "A#", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.J, IsBlack = false, Note = "B", Octave = 0 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.K, IsBlack = false, Note = "C", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.I, IsBlack = true, Note = "C#", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.L, IsBlack = false, Note = "D", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.O, IsBlack = true, Note = "D#", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.OemSemicolon, IsBlack = false, Note = "E", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.OemQuotes, IsBlack = false, Note = "F", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.P, IsBlack = true, Note = "F#", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.Enter, IsBlack = false, Note = "G", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.OemOpenBrackets, IsBlack = true, Note = "G#", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.B, IsBlack = false, Note = "A", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.N, IsBlack = true, Note = "A#", Octave = 1 });
-        //PianoKeys.Add(new PianoKeyViewModel { AssignedKey = Key.M, IsBlack = false, Note = "B", Octave = 1 });
     }
 
-    private void Key_KeyReleased(object? sender, KeyEventArgs e)
+    private void Piano_KeyReleased(object? sender, KeyPressedEventArgs e)
     {
+        var note = $"{e.Note}{(e.UpperRegister ? BaseOctave + 1 : BaseOctave)}";
+        _synthesizerService.NoteOff(note);
     }
 
-    private void Key_KeyPressed(object? sender, KeyEventArgs e)
+    private void Piano_KeyPressed(object? sender, KeyPressedEventArgs e)
     {
+        var note = $"{e.Note}{(e.UpperRegister ? BaseOctave + 1 : BaseOctave)}";
+
+        var (index, octave) = NoteHelper.ParseNoteString(note);
+        var frequency = (float)NoteHelper.NoteToFrequency(index, octave);
+
+        _synthesizerService.NoteOn(note, new VoiceData(frequency, .01f, .1f, .7f, .1f));
     }
 }
 

@@ -9,23 +9,23 @@ using SynthesizerUI.Services;
 
 namespace SynthesizerUI.ViewModel;
 
-public class PianoKeyViewModel : ObservableObject
+public sealed class PianoKeyViewModel : ObservableObject
 {
     private string _note;
     private bool _isBlack;
-    private int _octave;
+    private bool _upperRegister;
     private bool _isPressed;
 
     //private readonly ISynthesizerService _synthesizerService;
 
     // Define the events
-    public event EventHandler<KeyEventArgs> KeyPressed;
-    public event EventHandler<KeyEventArgs> KeyReleased;
+    public event EventHandler<KeyPressedEventArgs>? KeyPressed;
+    public event EventHandler<KeyPressedEventArgs>? KeyReleased;
 
-    public int Octave
+    public bool UpperRegister
     {
-        get => _octave;
-        set => SetProperty(ref _octave, value);
+        get => _upperRegister;
+        set => SetProperty(ref _upperRegister, value);
     }
 
     public string Note
@@ -50,7 +50,6 @@ public class PianoKeyViewModel : ObservableObject
     {
         _note = "";
 
-        //_synthesizerService = synthesizerService;
         KeyReleaseCommand = new RelayCommand(ExecuteKeyRelease);
         KeyPressCommand = new RelayCommand(ExecuteKeyPress);
     }
@@ -58,34 +57,21 @@ public class PianoKeyViewModel : ObservableObject
     private void ExecuteKeyPress()
     {
         IsPressed = true;
-
-        //var noteString = $"{Note}{Octave + 2}"; // i.e. C0, or C1
-        //var (index, actualOctave) = NoteHelper.ParseNoteString(noteString);
-        //var frequency = NoteHelper.NoteToFrequency(index, actualOctave);
-        // play sound
-        //_synthesizerService.NoteOn(new VoiceData(noteString, (float)frequency, .1f, .1f, .4f, .4f));
-
-        OnKeyPressed(new KeyEventArgs(Note, Octave));
-
+        OnKeyPressed(new KeyPressedEventArgs(Note, UpperRegister));
     }
 
     private void ExecuteKeyRelease()
     {
         IsPressed = false;
-
-        //var noteString = $"{Note}{Octave + 2}"; // i.e. C0, or C1
-        // Stop sound
-        //_synthesizerService.NoteOff(noteString);
-
-        OnKeyReleased(new KeyEventArgs(Note, Octave));
+        OnKeyReleased(new KeyPressedEventArgs(Note, UpperRegister));
     }
 
-    protected virtual void OnKeyPressed(KeyEventArgs e)
+    private void OnKeyPressed(KeyPressedEventArgs e)
     {
         KeyPressed?.Invoke(this, e);
     }
 
-    protected virtual void OnKeyReleased(KeyEventArgs e)
+    private void OnKeyReleased(KeyPressedEventArgs e)
     {
         KeyReleased?.Invoke(this, e);
     }
