@@ -12,12 +12,12 @@ public class NoteToCanvasLocationConverter : IMultiValueConverter
 
         var note = (string)values[0];
         var totalWidth = (double)values[1];
-        var upperRegister = (bool)values[2];
+        var octave = (int)values[2];
         var containerWidth = (double)values[3];
         var alignment = (HorizontalAlignment)values[4];
 
         // Calculate the original left position based on the noteAndOctave property
-        var leftPosition = CalculateLeftPositionBasedOnNoteAndOctave(note, upperRegister);
+        var leftPosition = CalculateLeftPositionBasedOnNoteAndOctave(note, octave);
 
         // Calculate the offset based on the alignment
         double offset = 0;
@@ -62,11 +62,16 @@ public class NoteToCanvasLocationConverter : IMultiValueConverter
 
 
 
-    private double CalculateLeftPositionBasedOnNoteAndOctave(string note, bool upperRegister)
+    private double CalculateLeftPositionBasedOnNoteAndOctave(string note, int noteIndex)
     {
 
-        var octave = upperRegister ? 1 : 0;
-        double baseOffset = 40 * octave * 7;
+        //var octave = upperRegister ? 1 : 0;
+
+//        var secondKeyboard = 
+
+        var octave = noteIndex >= 12 ? 1 : 0;
+
+        double baseOffset = 40 * octave * 7;// * index;
 
         if (!_offsetDictionary.TryGetValue(note, out var value))
             throw new ArgumentException($"Invalid note string: {note}", nameof(note));
@@ -76,6 +81,6 @@ public class NoteToCanvasLocationConverter : IMultiValueConverter
 
     private static bool CheckArguments(object[] values)
     {
-        return values is [string, double, bool, double, HorizontalAlignment, ..];
+        return values is [string, double, int, double, HorizontalAlignment, ..];
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace SynthesizerUI;
 
-public class KeyPressedEventArgs(string note, bool upperRegister) : EventArgs
+public class KeyPressedEventArgs(string note, int octave) : EventArgs
 {
     public string Note { get; } = note;
-    public bool UpperRegister { get; } = upperRegister;
+    public int Octave { get; } = octave;
 }

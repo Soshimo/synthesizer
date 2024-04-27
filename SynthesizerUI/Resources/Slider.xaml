@@ -3,7 +3,86 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" >
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Shared.xaml" />
+        <!--<ResourceDictionary Source="Shared.xaml" />-->
+
+        <ResourceDictionary>
+
+            <!-- Fill Brushes -->
+
+            <LinearGradientBrush x:Key="SliderThumbBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientBrush.GradientStops>
+                    <GradientStopCollection>
+                        <GradientStop Color="#114411" Offset="0.0"/>
+                        <GradientStop Color="#118811" Offset="1.0"/>
+                    </GradientStopCollection>
+                </GradientBrush.GradientStops>
+            </LinearGradientBrush>
+
+            <LinearGradientBrush x:Key="SliderHorizontalNormalBrush" StartPoint="0,0" EndPoint="1,0">
+                <GradientBrush.GradientStops>
+                    <GradientStopCollection>
+                        <GradientStop Color="#FFF" Offset="0.0"/>
+                        <GradientStop Color="#CCC" Offset="1.0"/>
+                    </GradientStopCollection>
+                </GradientBrush.GradientStops>
+            </LinearGradientBrush>
+
+            <LinearGradientBrush x:Key="SliderLightBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientBrush.GradientStops>
+                    <GradientStopCollection>
+                        <GradientStop Color="#11FF11" Offset="0.0"/>
+                        <GradientStop Color="#11EE11" Offset="1.0"/>
+                    </GradientStopCollection>
+                </GradientBrush.GradientStops>
+            </LinearGradientBrush>
+
+            <LinearGradientBrush x:Key="SliderHorizontalLightBrush" StartPoint="0,0" EndPoint="1,0">
+                <GradientBrush.GradientStops>
+                    <GradientStopCollection>
+                        <GradientStop Color="#11CC11" Offset="0.0"/>
+                        <GradientStop Color="#116611" Offset="1.0"/>
+                    </GradientStopCollection>
+                </GradientBrush.GradientStops>
+            </LinearGradientBrush>
+
+            <LinearGradientBrush x:Key="SliderDarkBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientBrush.GradientStops>
+                    <GradientStopCollection>
+                        <GradientStop Color="#11FF11" Offset="0.0"/>
+                        <GradientStop Color="#11AA11" Offset="1.0"/>
+                    </GradientStopCollection>
+                </GradientBrush.GradientStops>
+            </LinearGradientBrush>
+
+            <SolidColorBrush x:Key="SliderDisabledBackgroundBrush" Color="#EEE" />
+
+            <!-- Border Brushes -->
+
+            <LinearGradientBrush x:Key="SliderBorderBrush" StartPoint="0,0" EndPoint="0,1">
+                <GradientBrush.GradientStops>
+                    <GradientStopCollection>
+                        <GradientStop Color="#11CC11" Offset="0.0"/>
+                        <GradientStop Color="#114411" Offset="1.0"/>
+                    </GradientStopCollection>
+                </GradientBrush.GradientStops>
+            </LinearGradientBrush>
+
+            <LinearGradientBrush x:Key="SliderHorizontalNormalBorderBrush" StartPoint="0,0" EndPoint="1,0">
+                <GradientBrush.GradientStops>
+                    <GradientStopCollection>
+                        <GradientStop Color="#113311" Offset="0.0"/>
+                        <GradientStop Color="#112211" Offset="1.0"/>
+                    </GradientStopCollection>
+                </GradientBrush.GradientStops>
+            </LinearGradientBrush>
+
+            <!-- Miscellaneous Brushes -->
+            <SolidColorBrush x:Key="GlyphBrush" Color="#999911" />
+
+        </ResourceDictionary>
+
+
+
     </ResourceDictionary.MergedDictionaries>
 
     <!-- SimpleStyles: Slider -->
@@ -31,15 +110,15 @@
                 <ControlTemplate TargetType="{x:Type Thumb}">
                     <Ellipse 
             Name="Ellipse" 
-            Fill="{StaticResource NormalBrush}"
-            Stroke="{StaticResource NormalBorderBrush}"
+            Fill="{StaticResource SliderThumbBrush}"
+            Stroke="{StaticResource SliderBorderBrush}"
             StrokeThickness="1" />
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Ellipse" Property="Fill" Value="{StaticResource DarkBrush}"/>
+                            <Setter TargetName="Ellipse" Property="Fill" Value="{StaticResource SliderDarkBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter TargetName="Ellipse" Property="Fill" Value="{StaticResource DisabledBackgroundBrush}"/>
+                            <Setter TargetName="Ellipse" Property="Fill" Value="{StaticResource SliderDisabledBackgroundBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -47,7 +126,7 @@
         </Setter>
     </Style>
 
-    <ControlTemplate x:Key="HorizontalSlider" TargetType="{x:Type Slider}">
+    <!--<ControlTemplate x:Key="HorizontalSlider" TargetType="{x:Type Slider}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -67,8 +146,8 @@
         CornerRadius="2" 
         Height="4"
         Grid.Row="1"
-        Background="{StaticResource LightBrush}" 
-        BorderBrush="{StaticResource NormalBorderBrush}"
+        Background="{StaticResource SliderLightBrush}" 
+        BorderBrush="{StaticResource SliderThumbBrush}"
         BorderThickness="1" />
             <Track Grid.Row="1" Name="PART_Track">
                 <Track.DecreaseRepeatButton>
@@ -128,8 +207,8 @@
         CornerRadius="2" 
         Width="6"
         Grid.Column="1"
-        Background="{StaticResource HorizontalLightBrush}" 
-        BorderBrush="{StaticResource HorizontalNormalBorderBrush}"
+        Background="{StaticResource SliderHorizontalLightBrush}" 
+        BorderBrush="{StaticResource SliderHorizontalNormalBorderBrush}"
         BorderThickness="1" />
             <Track Grid.Column="1" Name="PART_Track">
                 <Track.DecreaseRepeatButton>
@@ -184,5 +263,5 @@
                 <Setter Property="Template" Value="{StaticResource VerticalSlider}" />
             </Trigger>
         </Style.Triggers>
-    </Style>
+    </Style>-->
 </ResourceDictionary>

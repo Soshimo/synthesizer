@@ -14,6 +14,7 @@
     <None Remove="Assets\max_mo.png" />
     <None Remove="Assets\shutdown_def.png" />
     <None Remove="Assets\shutdown_mo.png" />
+    <None Remove="Fonts\Syncopate.ttf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,10 +30,16 @@
     <Content Include="Assets\shutdown_mo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Fonts\Syncopate.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
+    <PackageReference Include="MaterialDesignColors" Version="2.0.7" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.6.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
   </ItemGroup>
 
@@ -44,6 +51,10 @@
     <None Update="Assets\max_def.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Behaviors\" />
   </ItemGroup>
 
 </Project>

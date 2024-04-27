@@ -98,7 +98,7 @@
                                 <MultiBinding Converter="{StaticResource NoteToCanvasLeftConverter}">
                                     <Binding Path="Note" />
                                     <Binding Path="TotalKeysWidth" RelativeSource="{RelativeSource AncestorType=UserControl}" />
-                                    <Binding Path="UpperRegister" />
+                                    <Binding Path="Index" />
                                 <Binding Path="ActualWidth" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
                                     <Binding Path="HorizontalAlignment" RelativeSource="{RelativeSource AncestorType=UserControl}" />
                                 </MultiBinding>
