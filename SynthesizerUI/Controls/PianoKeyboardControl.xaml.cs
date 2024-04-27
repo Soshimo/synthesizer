@@ -25,42 +25,6 @@ namespace SynthesizerUI
         public event EventHandler<KeyPressedEventArgs>? KeyPressed;
         public event EventHandler<KeyPressedEventArgs>? KeyReleased;
 
-        //public static readonly RoutedEvent PianoKeyPressedEvent = EventManager.RegisterRoutedEvent(
-        //    "PianoKeyPressed",
-        //    RoutingStrategy.Bubble,
-        //    typeof(RoutedEventHandler),
-        //    typeof(PianoKeyboardControl));
-
-        //public event RoutedEventHandler PianoKeyPressed
-        //{
-        //    add { AddHandler(PianoKeyPressedEvent, value); }
-        //    remove { RemoveHandler(PianoKeyPressedEvent, value); }
-        //}
-
-        //public static readonly RoutedEvent PianoKeyReleasedEvent = EventManager.RegisterRoutedEvent(
-        //    "PianoKeyReleased",
-        //    RoutingStrategy.Bubble,
-        //    typeof(RoutedEventHandler),
-        //    typeof(PianoKeyboardControl));
-
-        //public event RoutedEventHandler PianoKeyReleased
-        //{
-        //    add { AddHandler(PianoKeyReleasedEvent, value); }
-        //    remove { RemoveHandler(PianoKeyReleasedEvent, value); }
-        //}
-
-        //public void RaiseButtonClickedEvent(string parameter1, int parameter2)
-        //{
-        //    RoutedEventArgs args = new RoutedEventArgs(ButtonClickedEvent);
-        //    args.Source = this;
-        //    args.Data = new List<object> { parameter1, parameter2 };
-
-        //    RaiseEvent(args);
-        //}
-
-        //public static readonly RoutedCommand KeyPressCommand = new RoutedCommand("PianoKeyPressed", typeof(PianoKeyboardControl));
-        //public static readonly RoutedCommand KeyReleaseCommand = new RoutedCommand("PianoKeyReleased", typeof(PianoKeyboardControl));
-
         private readonly List<Key> _assignedKeyList =
         [
             Key.A,
@@ -103,20 +67,7 @@ namespace SynthesizerUI
             "F#", "G", "G#", "A", "A#", "B"
         ];
 
-        //// Dependency Property for Piano Keys
-        //public static readonly DependencyProperty PianoKeysProperty = DependencyProperty.Register(
-        //    nameof(PianoKeys),
-        //    typeof(ObservableCollection<PianoKeyViewModel>),
-        //    typeof(PianoKeyboardControl),
-        //    new PropertyMetadata(null));
-
         public ObservableCollection<PianoKeyViewModel> PianoKeys { get; } = new ObservableCollection<PianoKeyViewModel>();
-
-        //public ObservableCollection<PianoKeyViewModel> PianoKeys
-        //{
-        //  get => (ObservableCollection<PianoKeyViewModel>)GetValue(PianoKeysProperty);
-        //  set => SetValue(PianoKeysProperty, value);
-        //}
 
         public double TotalKeysWidth => 560;
 
@@ -157,18 +108,6 @@ namespace SynthesizerUI
             viewModel.IsPressed = true;
 
             OnKeyPressed(new KeyPressedEventArgs(viewModel.Note, viewModel.Octave));
-            //RaiseEvent(new PianoKeyPressedEventArgs(PianoKeyPressedEvent, viewModel));
-
-            //var key = $"{viewModel.Note}{viewModel.Octave}";
-
-            //RoutedEventArgs args = new RoutedEventArgs(PianoKeyPressedEvent);
-            //args.Source = viewModel;
-
-            //RaiseEvent(args);
-
-            //KeyPressCommand.Execute(key, this);
-
-            //viewModel?.KeyPressCommand.Execute(null);
         }
 
         private void UIElement_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -180,15 +119,6 @@ namespace SynthesizerUI
             viewModel.IsPressed = false;
 
             OnKeyReleased(new KeyPressedEventArgs(viewModel.Note, viewModel.Octave));
-
-            //RaiseEvent(new PianoKeyPressedEventArgs(PianoKeyReleasedEvent, viewModel));
-
-            //var key = $"{viewModel.Note}{viewModel.Octave}";
-
-            //KeyReleaseCommand.Execute(key, this);
-
-            //var viewModel = button.DataContext as PianoKeyViewModel;
-            //viewModel?.KeyReleaseCommand.Execute(null);
         }
 
         protected virtual void OnKeyReleased(KeyPressedEventArgs e)
