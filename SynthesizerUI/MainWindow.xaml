@@ -362,7 +362,11 @@
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="1" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" Padding="10" CornerRadius="10" Background="#222" Margin="10 0">
+                <Border Grid.Row="1" HorizontalAlignment="Center" BorderBrush="#aaa" BorderThickness="3" Padding="10" CornerRadius="10" Background="#222" Margin="10 0">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="3" Direction="315" Color="Black" BlurRadius="5" Opacity="0.5" />
+                    </Border.Effect>
+
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>

@@ -20,10 +20,10 @@ public class MainWindowViewModel : ViewModelBase
 
     private const int BaseOctave = 4;
 
-    private float _modFrequency;
+    private float _modFrequency = 2.1f;
     private string _selectedModShape = "saw";
-    private float _osc1Tremolo;
-    private float _osc2Tremolo;
+    private float _osc1Tremolo = 15;
+    private float _osc2Tremolo = 17;
 
     private string _osc1Waveform = "sine";
     private string _osc1Octave = "16'";
@@ -32,23 +32,23 @@ public class MainWindowViewModel : ViewModelBase
     private string _osc2Octave = "8'";
 
     private float _osc1Detune;
-    private float _osc2Detune;
-    private float _osc1Mix;
-    private float _osc2Mix;
+    private float _osc2Detune = -25;
+    private float _osc1Mix = 50;
+    private float _osc2Mix = 50;
 
-    private float _volumeEnvelopeAttack;
-    private float _volumeEnvelopeDecay;
-    private float _volumeEnvelopeSustain;
-    private float _volumeEnvelopeRelease;
+    private float _volumeEnvelopeAttack = .02f;
+    private float _volumeEnvelopeDecay = .15f;
+    private float _volumeEnvelopeSustain = .68f;
+    private float _volumeEnvelopeRelease = .05f;
 
-    private float _filterCutoff;
-    private float _filterResonance;
-    private float _filterMod;
-    private float _filterEnvelope;
+    private float _filterCutoff = 256;
+    private float _filterResonance = 7;
+    private float _filterMod = 21;
+    private float _filterEnvelope = 56;
 
-    private float _masterDrive;
-    private float _masterVolume;
-    private float _masterReverb;
+    private float _masterDrive = 38;
+    private float _masterVolume = 75;
+    private float _masterReverb = 32;
 
     private KeyboardOctave _keyboardOctave;
 
