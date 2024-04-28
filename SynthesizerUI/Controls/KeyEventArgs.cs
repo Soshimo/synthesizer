@@ -1,4 +1,4 @@
-﻿namespace SynthesizerUI;
+﻿namespace SynthesizerUI.Controls;
 
 public class KeyPressedEventArgs : EventArgs
 {

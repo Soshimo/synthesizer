@@ -1,4 +1,5 @@
-﻿using SynthesizerUI.ViewModel;
+﻿using SynthesizerUI.Controls;
+using SynthesizerUI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

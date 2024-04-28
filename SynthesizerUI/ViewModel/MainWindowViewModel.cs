@@ -92,29 +92,46 @@ public class MainWindowViewModel : ViewModelBase
         {
             if (SelectedDevice == null)
             {
-                _midiIn?.Stop();
-                _midiIn?.Dispose();
+                try
+                {
+                    _midiIn?.Stop();
 
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+                if (_midiIn != null)
+                {
+                    _midiIn.MessageReceived -= MidiIn_MessageReceived;
+                    _midiIn.ErrorReceived -= MidiIn_ErrorReceived;
+                }
+
+                _midiIn?.Dispose();
                 _midiIn = null;
                 return;
             }
 
-            _dialogService.ShowDialog<DialogTemplates.Notification>(result =>
-            {
-                if (!bool.TryParse(result, out var dialogResult)) return;
-                if (!dialogResult)
-                {
-                    SelectedDevice = null;
-                    return;
-                }
+            _midiIn = new MidiIn(SelectedDevice.Id);
+            _midiIn.MessageReceived += MidiIn_MessageReceived;
+            _midiIn.ErrorReceived += MidiIn_ErrorReceived;
+            _midiIn.Start();
 
-                _midiIn = new MidiIn(SelectedDevice.Id);
-                _midiIn.MessageReceived += MidiIn_MessageReceived;
-                _midiIn.ErrorReceived += MidiIn_ErrorReceived;
-                _midiIn.Start();
-            });
+            //_dialogService.ShowDialog<DialogTemplates.Notification>(result =>
+            //{
+            //    if (!bool.TryParse(result, out var dialogResult)) return;
+            //    if (!dialogResult)
+            //    {
+            //        SelectedDevice = null;
+            //        return;
+            //    }
 
-
+            //    _midiIn = new MidiIn(SelectedDevice.Id);
+            //    _midiIn.MessageReceived += MidiIn_MessageReceived;
+            //    _midiIn.ErrorReceived += MidiIn_ErrorReceived;
+            //    _midiIn.Start();
+            //});
         });
     }
 
@@ -304,7 +321,26 @@ public class MainWindowViewModel : ViewModelBase
 
     private void MidiIn_MessageReceived(object? sender, MidiInMessageEventArgs e)
     {
-        var chanel = e.MidiEvent.Channel;
+        if (e.MidiEvent.CommandCode == MidiCommandCode.NoteOn && e.MidiEvent.Channel == 1)
+        {
+            if (e.MidiEvent is not NoteOnEvent note) return;
+
+            var key = note.NoteName;
+
+            var (index, octave) = NoteHelper.ParseNoteString(note.NoteName);
+            var frequency = NoteHelper.NoteToFrequency(note.NoteNumber);
+
+            var data = GetVoiceData((float)frequency);
+
+            _synthesizerService.NoteOn(key, data);
+        }
+        else if(e.MidiEvent.CommandCode == MidiCommandCode.NoteOff && e.MidiEvent.Channel == 1)
+        {
+            if (e.MidiEvent is not NoteEvent note) return;
+
+            var key = note.NoteName;
+            _synthesizerService.NoteOff(key);
+        }
     }
 
     private List<MidiDeviceInfo> UpdateAvailableDevices()
@@ -399,19 +435,4 @@ public class MainWindowViewModel : ViewModelBase
     }
 
 
-}
-
-public class MidiDeviceInfoComparer : IEqualityComparer<MidiDeviceInfo>
-{
-    public bool Equals(MidiDeviceInfo? x, MidiDeviceInfo? y)
-    {
-        if (ReferenceEquals(x, y)) return true;
-        if(x == null || y == null) return false;
-        return x.Name == y.Name;
-    }
-
-    public int GetHashCode(MidiDeviceInfo obj)
-    {
-        return obj.Name?.GetHashCode() ?? 0;
-    }
 }

@@ -52,4 +52,21 @@ public static class NoteHelper
         double frequency = referenceFrequency * Math.Pow(2, halfStepsFromA0 / 12.0);
         return frequency;
     }
+
+    public static double NoteToFrequency(int noteIndex)
+    {
+        // A4 (440 Hz) is at note index 69
+        const double A4Frequency = 440.0;
+        const int A4NoteIndex = 69;
+
+        // Calculate the number of semitones from A4
+        var semitonesFromA4 = noteIndex - A4NoteIndex;
+
+        // Calculate the frequency adjustment factor based on semitones
+        // (2^(semitones / 12))
+        var frequencyFactor = Math.Pow(2.0, semitonesFromA4 / 12.0);
+
+        // Apply the factor to A4 frequency to get the target frequency
+        return A4Frequency * frequencyFactor;
+    }
 }

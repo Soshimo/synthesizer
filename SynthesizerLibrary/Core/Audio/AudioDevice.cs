@@ -5,7 +5,7 @@ namespace SythesizerLibrary.Core.Audio;
 
 public class AudioDevice : AudioNode
 {
-    private List<IAudioNode> _nodes;
+    private List<IAudioNode>? _nodes;
     private int _writePosition = 0;
 
     public AudioDevice(IAudioProvider provider) : base(provider, 1, 0)

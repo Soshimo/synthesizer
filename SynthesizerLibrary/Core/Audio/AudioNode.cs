@@ -14,8 +14,6 @@ public class AudioNode : IAudioNode
     public List<IAudioNode> InputPassThroughNodes { get; }
     public List<IAudioNode> OutputPassThroughNodes { get; set; }
 
-    protected bool IsVirtual { get; init; }
-
     public bool IsAggregate { get; }
     public bool NeedsTraverse { get; set; }
 
@@ -51,8 +49,8 @@ public class AudioNode : IAudioNode
         // for the pass through nodes
         for (var i = 0; i < numberOfInputs; i++)
         {
-            var passthrough = new PassThroughNode(AudioProvider, 1, 1);
-            InputPassThroughNodes.Add(passthrough);
+            var passThrough = new PassThroughNode(AudioProvider, 1, 1);
+            InputPassThroughNodes.Add(passThrough);
         }
 
         for (var i = 0; i < numberOfOutputs; i++)
@@ -61,36 +59,39 @@ public class AudioNode : IAudioNode
         }
     }
 
-    public virtual void Connect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
+    public virtual void Connect(IAudioNode? node, int inputIndex = 0, int outputIndex = 0)
     {
-        if (node.IsAggregate)
+        if (node?.IsAggregate == true)
         {
             node = node.InputPassThroughNodes[inputIndex];
             inputIndex = 0;
         }
 
-        var inputPin = node.Inputs[inputIndex];
+        var inputPin = node?.Inputs[inputIndex];
         var outputPin = IsAggregate ? OutputPassThroughNodes[outputIndex].Outputs[0] : Outputs[outputIndex];
 
-        outputPin.Connect(inputPin);
-        inputPin.Connect(outputPin);
+        if (inputPin != null)
+        {
+            outputPin.Connect(inputPin);
+            inputPin.Connect(outputPin);
+        }
 
         AudioProvider.NeedTraverse = true;
     }
 
-    public virtual void Disconnect(IAudioNode node, int inputIndex = 0, int outputIndex = 0)
+    public virtual void Disconnect(IAudioNode? node, int inputIndex = 0, int outputIndex = 0)
     {
-        if (node.IsAggregate)
+        if (node?.IsAggregate == true)
         {
             node = node.InputPassThroughNodes[inputIndex];
             inputIndex = 0;
         }
 
-        var inputPin = node.Inputs[inputIndex];
+        var inputPin = node?.Inputs[inputIndex];
         var outputPin = IsAggregate ? OutputPassThroughNodes[outputIndex].Outputs[0] : Outputs[outputIndex];
 
-        inputPin.Disconnect(outputPin);
-        outputPin.Disconnect(inputPin);
+        inputPin?.Disconnect(outputPin);
+        if (inputPin != null) outputPin.Disconnect(inputPin);
 
 
         AudioProvider.NeedTraverse = true;
@@ -116,7 +117,7 @@ public class AudioNode : IAudioNode
 
             if (output.Samples.Count < numberOfChannels)
             {
-                for (int j = output.Samples.Count; j < numberOfChannels; j++)
+                for (var j = output.Samples.Count; j < numberOfChannels; j++)
                 {
                     output.Samples.Add(0);
                 }
@@ -132,6 +133,7 @@ public class AudioNode : IAudioNode
 
     protected virtual void MigrateInputSamples()
     {
+        // ReSharper disable once ForCanBeConvertedToForeach
         for (var i = 0; i < Inputs.Count; i++)
         {
             var input = Inputs[i];
@@ -140,6 +142,7 @@ public class AudioNode : IAudioNode
 
             input.Samples.Clear();
 
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (var j = 0; j < input.Connected.Count; j++)
             {
                 var output = input.Connected[j];
@@ -173,7 +176,7 @@ public class AudioNode : IAudioNode
             foreach (var outputPin in input.Connected)
             {
                 var output = outputPin.Node;
-                output.Disconnect(this, outputPin.Index, input.Index);
+                output?.Disconnect(this, outputPin.Index, input.Index);
             }
         }
 
@@ -183,7 +186,7 @@ public class AudioNode : IAudioNode
             foreach (var inputPin in output.Connected)
             {
                 var input = inputPin.Node;
-                Disconnect(input, output.Index, inputPin.Index);
+                if (input != null) Disconnect(input, output.Index, inputPin.Index);
             }
         }
 
@@ -197,27 +200,38 @@ public class AudioNode : IAudioNode
             passThrough.Remove();
         }
     }
-    public virtual List<IAudioNode> Traverse(List<IAudioNode> nodes)
+    public virtual List<IAudioNode>? Traverse(List<IAudioNode>? nodes)
     {
-        if (nodes.Contains(this)) return nodes;
+        if (nodes != null && nodes.Contains(this)) return nodes;
 
-        nodes.Add(this);
+        nodes?.Add(this);
         nodes = TraverseParents(nodes);
         return nodes;
     }
-    protected virtual List<IAudioNode> TraverseParents(List<IAudioNode> nodes)
+    protected virtual List<IAudioNode>? TraverseParents(List<IAudioNode>? nodes)
     {
         var current = nodes;
 
+        // ReSharper disable once ForCanBeConvertedToForeach
+
         // First, loop through each input
-        foreach (var inputChannel in Inputs)
+        for (var inputIndex = 0; inputIndex < Inputs.Count; inputIndex++)
         {
+            var inputChannel = Inputs[inputIndex];
+
+            // ReSharper disable once ForCanBeConvertedToForeach
+            // ReSharper disable once LoopCanBeConvertedToQuery
+        
             // Then loop through each 'Connected' entry in the current input
-            foreach (var outputChannel in inputChannel.Connected)
+            for (var connectedIndex = 0; connectedIndex < inputChannel.Connected.Count; connectedIndex++)
             {
+                var outputChannel = inputChannel.Connected[connectedIndex];
+
                 // Perform the 'Traverse' method on the node of the current stream,
                 // and update 'current' with the result
-                current = outputChannel.Node.IsAggregate ? outputChannel.Node.OutputPassThroughNodes[outputChannel.Index].Traverse(current) : outputChannel.Node.Traverse(current);
+                current = outputChannel.Node is { IsAggregate: true } ? 
+                    outputChannel.Node.OutputPassThroughNodes[outputChannel.Index].Traverse(current) : 
+                    outputChannel.Node?.Traverse(current);
             }
         }
 

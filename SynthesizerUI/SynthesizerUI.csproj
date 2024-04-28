@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controls\PianoKeyPressedEventArgs.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Assets\LittlePhatty.png" />
     <None Remove="Assets\max_def.png" />
     <None Remove="Assets\max_mo.png" />

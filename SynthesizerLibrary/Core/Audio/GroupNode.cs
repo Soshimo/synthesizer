@@ -19,7 +19,7 @@ public class GroupNode : AudioNode
         }
     }
 
-    public override List<IAudioNode> Traverse(List<IAudioNode> nodes)
+    public override List<IAudioNode>? Traverse(List<IAudioNode>? nodes)
     {
         if (nodes.Contains(this)) return nodes;
 
