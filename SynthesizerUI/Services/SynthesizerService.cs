@@ -1,6 +1,7 @@
 ﻿using SynthesizerLibrary.DSP;
 using SynthesizerLibrary.Util;
 using SynthesizerUI.Model;
+using SynthesizerUI.Services.Interface;
 using SythesizerLibrary.Core.Audio;
 
 namespace SynthesizerUI.Services;

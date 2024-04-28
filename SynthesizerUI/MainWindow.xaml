@@ -8,7 +8,7 @@
         xmlns:converters="clr-namespace:SynthesizerUI.Converters"
         xmlns:dependencyObjects="clr-namespace:SynthesizerUI.DependencyObjects"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowViewModel}"
+        DataContext="{Binding Path=MainWindowViewModel, Source={StaticResource ViewModelLocator}}"
         KeyDown="MainWindow_OnKeyDown"
         KeyUp="MainWindow_OnKeyUp"
         mc:Ignorable="d"
@@ -238,6 +238,7 @@
         <converters:RoundingValueConverter x:Key="RoundingValueConverter"/>
         <converters:FrequencyValueConverter x:Key="FrequencyValueConverter" />
         <converters:DefaultValueConverter x:Key="DefaultValueConverter"/>
+        <converters:ObjectToDisplayValueConverter x:Key="ObjectToDisplayValueConverter" />
 
         <Style TargetType="GroupBox" x:Key="FieldsetStyle">
             <Setter Property="Template">
@@ -361,7 +362,7 @@
                     <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Padding="10" CornerRadius="10" Background="#222" Margin="10 0">
+                <Border Grid.Row="1" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" Padding="10" CornerRadius="10" Background="#222" Margin="10 0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
@@ -792,9 +793,7 @@
                                             </local:KnobControl.SpriteSheet>
                                         </local:KnobControl>
 
-                                        <Label Style="{DynamicResource MaterialDesignLabel}" HorizontalAlignment="Center"
-                               Foreground="White" FontWeight="Bold"
-                               Content="cutoff" />
+                                        <Label Style="{DynamicResource MaterialDesignLabel}" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Content="cutoff" />
 
                                     </StackPanel>
                                 </Grid>
@@ -803,22 +802,21 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <Border 
-                            Style="{StaticResource FadingBorderStyle}">
+                                    <Border Style="{StaticResource FadingBorderStyle}">
                                         <Label Style="{StaticResource SynthLabelStyle}"
-                                       Content="{Binding Path=FilterQ}" />
+                                       Content="{Binding Path=FilterResonance}" />
                                     </Border>
 
                                     <StackPanel Grid.Row="1">
 
                                         <local:KnobControl 
-                            VerticalAlignment="Top" 
-                            Value="{Binding Path=FilterQ, Mode=TwoWay}" 
-                            Margin="0,2,0,0" 
-                            Maximum="20"
-                            Minimum="0"
-                            Width="64" 
-                            Height="64">
+                                            VerticalAlignment="Top" 
+                                            Value="{Binding Path=FilterResonance, Mode=TwoWay}" 
+                                            Margin="0,2,0,0" 
+                                            Maximum="20"
+                                            Minimum="0"
+                                            Width="64" 
+                                            Height="64">
                                             <local:KnobControl.SpriteSheet>
                                                 <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
                                                     <dependencyObjects:SpriteSheet.Range>
@@ -843,14 +841,14 @@
                                     <Border 
                             Style="{StaticResource FadingBorderStyle}">
                                         <Label Style="{StaticResource SynthLabelStyle}"
-                                       Content="{Binding Path=FilterModulation}" />
+                                       Content="{Binding Path=FilterMod}" />
                                     </Border>
 
                                     <StackPanel Grid.Row="1">
 
                                         <local:KnobControl 
                             VerticalAlignment="Top" 
-                            Value="{Binding Path=FilterModulation, Mode=TwoWay}" 
+                            Value="{Binding Path=FilterMod, Mode=TwoWay}" 
                             Margin="0,2,0,0" 
                             Maximum="100"
                             Minimum="0"
@@ -920,7 +918,7 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <GroupBox Grid.Row="0" Header="filter envelope" Style="{StaticResource FieldsetStyle}">
-                                <Grid>
+                                <!--<Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="90"/>
                                         <ColumnDefinition Width="90"/>
@@ -1072,9 +1070,144 @@
                                         </StackPanel>
                                     </Grid>
 
-                                </Grid>
+                                </Grid>-->
 
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="90"/>
+
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0" Margin="0 20 0 0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                        </Grid.RowDefinitions>
+
+                                        <Border 
+                                                Style="{StaticResource FadingBorderStyle}">
+                                            <Label Style="{StaticResource SynthLabelStyle}" 
+                                                       Content="{Binding ElementName=FilterEnvelopeAttack, Path=Value, StringFormat={}{0:00.0}}" 
+                                                       ContentStringFormat="{}{0:0.00}" 
+                                                       />
+                                        </Border>
+
+
+                                        <Slider Grid.Row="1" x:Name="FilterEnvelopeAttack"
+                                                    Orientation="Vertical"
+                                                    Height="100"
+                                                    Margin="0 4"
+                                                    LargeChange=".2"
+                                                    HorizontalAlignment="Center"
+                                                    TickPlacement="TopLeft"
+                                                    TickFrequency="1"
+                                                    Value="{Binding FilterEnvelopeAttack}"
+                                                    Minimum=".01"
+                                                    Maximum="5" />
+
+                                        <TextBlock Grid.Row="2" Text="attack" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
+
+
+                                    </Grid>
+                                    <Grid Grid.Column="1" Margin="0, 20, 0, 0" VerticalAlignment="Bottom">
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                        </Grid.RowDefinitions>
+
+                                        <Border 
+                                                Style="{StaticResource FadingBorderStyle}">
+                                            <Label Style="{StaticResource SynthLabelStyle}" 
+                                                       Content="{Binding ElementName=FilterEnvelopeDecay, Path=Value, StringFormat={}{0:00.0}}" 
+                                                       ContentStringFormat="{}{0:0.00}" 
+                                                />
+                                        </Border>
+
+
+                                        <Slider Grid.Row="1" x:Name="FilterEnvelopeDecay"
+                                                    Orientation="Vertical"
+                                                    Height="100"
+                                                    Margin="0 4"
+                                                    LargeChange=".1"
+                                                    HorizontalAlignment="Center"
+                                                    TickPlacement="TopLeft"
+                                                    TickFrequency=".1"
+                                                    Value="{Binding FilterEnvelopeDecay}"
+                                                    Minimum=".01"
+                                                    Maximum="1" />
+
+                                        <TextBlock Grid.Row="2" Text="decay" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
+                                    </Grid>
+                                    <Grid Grid.Column="2" Margin="0, 20, 0, 0" VerticalAlignment="Bottom">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                        </Grid.RowDefinitions>
+
+                                        <Border 
+                                            Style="{StaticResource FadingBorderStyle}">
+                                            <Label Style="{StaticResource SynthLabelStyle}" 
+                                                   Content="{Binding ElementName=FilterEnvelopeSustain, Path=Value, StringFormat={}{0:00.0}}" 
+                                                   ContentStringFormat="{}{0:0.00}" 
+                                            />
+                                        </Border>
+
+
+                                        <Slider Grid.Row="1" x:Name="FilterEnvelopeSustain"
+                                                Orientation="Vertical"
+                                                Height="100"
+                                                Margin="0 4"
+                                                LargeChange=".1"
+                                                HorizontalAlignment="Center"
+                                                TickPlacement="TopLeft"
+                                                TickFrequency=".1"
+                                                Value="{Binding FilterEnvelopeSustain}"
+                                                Minimum=".01"
+                                                Maximum="1" />
+
+                                        <TextBlock Grid.Row="2" Text="sustain" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
+                                    </Grid>
+                                    <Grid Grid.Column="3" Margin="0, 20, 0, 0" VerticalAlignment="Bottom">
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                        </Grid.RowDefinitions>
+
+                                        <Border 
+                                            Style="{StaticResource FadingBorderStyle}">
+                                            <Label Style="{StaticResource SynthLabelStyle}" 
+                                                   Content="{Binding ElementName=FilterEnvelopeRelease, Path=Value, StringFormat={}{0:00.0}}" 
+                                                   ContentStringFormat="{}{0:0.0}" 
+                                            />
+                                        </Border>
+
+
+                                        <Slider Grid.Row="1" x:Name="FilterEnvelopeRelease"
+                                                Orientation="Vertical"
+                                                Height="100"
+                                                Margin="0 4"
+                                                LargeChange=".2"
+                                                HorizontalAlignment="Center"
+                                                TickPlacement="TopLeft"
+                                                TickFrequency="1"
+                                                Value="{Binding FilterEnvelopeRelease}"
+                                                Minimum=".01"
+                                                Maximum="10" />
+
+                                        <TextBlock Grid.Row="2" Text="release" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
+
                             <GroupBox Grid.Row="1" Header="volume envelope" Style="{StaticResource FieldsetStyle}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -1085,132 +1218,129 @@
 
                                     </Grid.ColumnDefinitions>
 
-                                    <Grid Margin="0, 20, 0, 0" VerticalAlignment="Bottom">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="20"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-                                        <Border 
-                                Style="{StaticResource FadingBorderStyle}">
-                                            <Label Style="{StaticResource SynthLabelStyle}"
-                                           Content="{Binding Path=VolumeEnvelopeAttack}" />
-                                        </Border>
-                                        <StackPanel Grid.Row="1">
+                                    <Grid Grid.Column="0" Margin="0 20 0 0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                            </Grid.RowDefinitions>
 
-                                            <local:KnobControl 
-                                    VerticalAlignment="Top" 
-                                    Value="{Binding Path=VolumeEnvelopeAttack, Mode=TwoWay}" 
-                                    Maximum="100"
-                                    Minimum="0"
-                                    Step="10"
-                                    Margin="0,2,0,0" 
-                                    Width="64" Height="64">
-                                                <local:KnobControl.SpriteSheet>
-                                                    <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
-                                                        <dependencyObjects:SpriteSheet.Range>
-                                                            <dependencyObjects:IntegerRange End="100" />
-                                                        </dependencyObjects:SpriteSheet.Range>
-                                                    </dependencyObjects:SpriteSheet>
-                                                </local:KnobControl.SpriteSheet>
+                                            <Border 
+                                                Style="{StaticResource FadingBorderStyle}">
+                                                <Label Style="{StaticResource SynthLabelStyle}" 
+                                                       Content="{Binding ElementName=VolumeEnvelopeAttack, Path=Value, StringFormat={}{0:00.0}}" 
+                                                       ContentStringFormat="{}{0:0.00}" 
+                                                       />
+                                            </Border>
 
-                                            </local:KnobControl>
 
-                                            <Label Style="{DynamicResource MaterialDesignLabel}" HorizontalAlignment="Center"
-                                       Foreground="White" FontWeight="Bold"
-                                       Content="attack" />
+                                            <Slider Grid.Row="1" x:Name="VolumeEnvelopeAttack"
+                                                    Orientation="Vertical"
+                                                    Height="100"
+                                                    Margin="0 4"
+                                                    LargeChange=".2"
+                                                    HorizontalAlignment="Center"
+                                                    TickPlacement="TopLeft"
+                                                    TickFrequency="1"
+                                                    Value="{Binding VolumeEnvelopeAttack}"
+                                                    Minimum=".01"
+                                                    Maximum="5" />
 
-                                        </StackPanel>
-                                    </Grid>
+                                            <TextBlock Grid.Row="2" Text="attack" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
+
+
+                                        </Grid>
                                     <Grid Grid.Column="1" Margin="0, 20, 0, 0" VerticalAlignment="Bottom">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="20"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-                                        <Border 
-                                Style="{StaticResource FadingBorderStyle}">
-                                            <Label Style="{StaticResource SynthLabelStyle}"
-                                           Content="{Binding Path=VolumeEnvelopeDecay}" />
-                                        </Border>
-                                        <StackPanel Grid.Row="1">
 
-                                            <local:KnobControl 
-                                VerticalAlignment="Top" 
-                                Value="{Binding Path=VolumeEnvelopeDecay, Mode=TwoWay}" 
-                                Margin="0,2,0,0" 
-                                Width="64" Height="64">
-                                                <local:KnobControl.SpriteSheet>
-                                                    <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
-                                                        <dependencyObjects:SpriteSheet.Range>
-                                                            <dependencyObjects:IntegerRange End="100" />
-                                                        </dependencyObjects:SpriteSheet.Range>
-                                                    </dependencyObjects:SpriteSheet>
-                                                </local:KnobControl.SpriteSheet>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                                <RowDefinition Height="Auto"></RowDefinition>
+                                            </Grid.RowDefinitions>
 
-                                            </local:KnobControl>
+                                            <Border 
+                                                Style="{StaticResource FadingBorderStyle}">
+                                                <Label Style="{StaticResource SynthLabelStyle}" 
+                                                       Content="{Binding ElementName=VolumeEnvelopeDecay, Path=Value, StringFormat={}{0:00.0}}" 
+                                                       ContentStringFormat="{}{0:0.00}" 
+                                                />
+                                            </Border>
 
-                                            <Label Style="{DynamicResource MaterialDesignLabel}" HorizontalAlignment="Center"
-                                   Foreground="White" FontWeight="Bold"
-                                   Content="decay" />
 
-                                        </StackPanel>
-                                    </Grid>
+                                            <Slider Grid.Row="1" x:Name="VolumeEnvelopeDecay"
+                                                    Orientation="Vertical"
+                                                    Height="100"
+                                                    Margin="0 4"
+                                                    LargeChange=".1"
+                                                    HorizontalAlignment="Center"
+                                                    TickPlacement="TopLeft"
+                                                    TickFrequency=".1"
+                                                    Value="{Binding VolumeEnvelopeDecay}"
+                                                    Minimum=".01"
+                                                    Maximum="1" />
 
+                                            <TextBlock Grid.Row="2" Text="decay" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
+                                        </Grid>
                                     <Grid Grid.Column="2" Margin="0, 20, 0, 0" VerticalAlignment="Bottom">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="20"/>
-                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
                                         </Grid.RowDefinitions>
+
                                         <Border 
-                                Style="{StaticResource FadingBorderStyle}">
-                                            <Label Style="{StaticResource SynthLabelStyle}"
-                                           Content="{Binding Path=VolumeEnvelopeSustain}" />
+                                            Style="{StaticResource FadingBorderStyle}">
+                                            <Label Style="{StaticResource SynthLabelStyle}" 
+                                                   Content="{Binding ElementName=VolumeEnvelopeSustain, Path=Value, StringFormat={}{0:00.0}}" 
+                                                   ContentStringFormat="{}{0:0.00}" 
+                                            />
                                         </Border>
-                                        <StackPanel Grid.Row="1">
 
-                                            <local:KnobControl VerticalAlignment="Top" Value="{Binding Path=VolumeEnvelopeSustain, Mode=TwoWay}" Margin="0,2,0,0" Width="64" Height="64">
-                                                <local:KnobControl.SpriteSheet>
-                                                    <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
-                                                        <dependencyObjects:SpriteSheet.Range>
-                                                            <dependencyObjects:IntegerRange End="100" />
-                                                        </dependencyObjects:SpriteSheet.Range>
-                                                    </dependencyObjects:SpriteSheet>
-                                                </local:KnobControl.SpriteSheet>
 
-                                            </local:KnobControl>
+                                        <Slider Grid.Row="1" x:Name="VolumeEnvelopeSustain"
+                                                Orientation="Vertical"
+                                                Height="100"
+                                                Margin="0 4"
+                                                LargeChange=".1"
+                                                HorizontalAlignment="Center"
+                                                TickPlacement="TopLeft"
+                                                TickFrequency=".1"
+                                                Value="{Binding VolumeEnvelopeSustain}"
+                                                Minimum=".01"
+                                                Maximum="1" />
 
-                                            <Label Style="{DynamicResource MaterialDesignLabel}" HorizontalAlignment="Center"
-                                       Foreground="White" FontWeight="Bold"
-                                       Content="sustain" />
-
-                                        </StackPanel>
+                                        <TextBlock Grid.Row="2" Text="sustain" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
                                     </Grid>
                                     <Grid Grid.Column="3" Margin="0, 20, 0, 0" VerticalAlignment="Bottom">
+
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="20"/>
-                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
                                         </Grid.RowDefinitions>
+
                                         <Border 
-                                Style="{StaticResource FadingBorderStyle}">
-                                            <Label Style="{StaticResource SynthLabelStyle}"
-                                           Content="{Binding Path=VolumeEnvelopeRelease}" />
+                                            Style="{StaticResource FadingBorderStyle}">
+                                            <Label Style="{StaticResource SynthLabelStyle}" 
+                                                   Content="{Binding ElementName=VolumeEnvelopeRelease, Path=Value, StringFormat={}{0:00.0}}" 
+                                                   ContentStringFormat="{}{0:0.0}" 
+                                            />
                                         </Border>
-                                        <StackPanel Grid.Row="1">
 
-                                            <local:KnobControl VerticalAlignment="Top" Value="{Binding Path=VolumeEnvelopeRelease, Mode=TwoWay}" Margin="0,2,0,0" Width="64" Height="64">
-                                                <local:KnobControl.SpriteSheet>
-                                                    <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
-                                                        <dependencyObjects:SpriteSheet.Range>
-                                                            <dependencyObjects:IntegerRange End="100" />
-                                                        </dependencyObjects:SpriteSheet.Range>
-                                                    </dependencyObjects:SpriteSheet>
-                                                </local:KnobControl.SpriteSheet>
-                                            </local:KnobControl>
 
-                                            <Label Style="{DynamicResource MaterialDesignLabel}" HorizontalAlignment="Center"
-                                       Foreground="White" FontWeight="Bold"
-                                       Content="release" />
+                                        <Slider Grid.Row="1" x:Name="VolumeEnvelopeRelease"
+                                                Orientation="Vertical"
+                                                Height="100"
+                                                Margin="0 4"
+                                                LargeChange=".2"
+                                                HorizontalAlignment="Center"
+                                                TickPlacement="TopLeft"
+                                                TickFrequency="1"
+                                                Value="{Binding VolumeEnvelopeRelease}"
+                                                Minimum=".01"
+                                                Maximum="10" />
 
-                                        </StackPanel>
+                                        <TextBlock Grid.Row="2" Text="release" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
                                     </Grid>
                                 </Grid>
                             </GroupBox>
@@ -1232,12 +1362,12 @@
 
                                         <Border Style="{StaticResource FadingBorderStyle}">
                                             <Label Style="{StaticResource SynthLabelStyle}"
-                                           Content="{Binding Path=Drive}" />
+                                           Content="{Binding Path=MasterDrive}" />
                                         </Border>
 
                                         <StackPanel Grid.Row="1">
 
-                                            <local:KnobControl VerticalAlignment="Top" Value="{Binding Path=Drive, Mode=TwoWay}" Margin="0,2,0,0" Width="64" Height="64">
+                                            <local:KnobControl VerticalAlignment="Top" Value="{Binding Path=MasterDrive, Mode=TwoWay}" Margin="0,2,0,0" Width="64" Height="64">
                                                 <local:KnobControl.SpriteSheet>
                                                     <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
                                                         <dependencyObjects:SpriteSheet.Range>
@@ -1249,10 +1379,11 @@
                                             </local:KnobControl>
 
                                             <Label Style="{DynamicResource MaterialDesignLabel}" HorizontalAlignment="Center"
-                                   Foreground="White" FontWeight="Bold"
-                                   Content="drive" />
+                                               Foreground="White" FontWeight="Bold"
+                                               Content="drive" />
 
                                         </StackPanel>
+
                                     </Grid>
                                     <Grid Grid.Column="1" Margin="0, 10, 0, 0" VerticalAlignment="Bottom">
 
@@ -1264,12 +1395,12 @@
                                         <Border 
                                 Style="{StaticResource FadingBorderStyle}">
                                             <Label Style="{StaticResource SynthLabelStyle}"
-                                           Content="{Binding Path=Reverb}" />
+                                           Content="{Binding Path=MasterReverb}" />
                                         </Border>
 
 
                                         <StackPanel Grid.Row="1">
-                                            <local:KnobControl VerticalAlignment="Top" Value="{Binding Path=Reverb, Mode=TwoWay}" Margin="0,2,0,0" Width="64" Height="64">
+                                            <local:KnobControl VerticalAlignment="Top" Value="{Binding Path=MasterReverb, Mode=TwoWay}" Margin="0,2,0,0" Width="64" Height="64">
                                                 <local:KnobControl.SpriteSheet>
                                                     <dependencyObjects:SpriteSheet Source="/Assets/LittlePhatty.png" Orientation="Vertical" Cells="101">
                                                         <dependencyObjects:SpriteSheet.Range>
@@ -1330,12 +1461,23 @@
                                       materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource SecondaryHueLightBrush}"
                                       materialDesign:ColorZoneAssist.Mode="Dark"
                                       materialDesign:HintAssist.Hint="midi_in"
-                                      ItemsSource="{Binding MidiDevices}" 
+                                      ItemsSource="{Binding AvailableDevices}" 
                                       SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"  
                                       VerticalAlignment="Top" 
                                       HorizontalAlignment="Left"
                                       FontFamily="/Fonts/#Syncopate"
-                                      ToolTipService.ToolTip="Please select a waveform.">
+                                      ToolTipService.ToolTip="Please select a midi device.">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Converter={StaticResource ObjectToDisplayValueConverter}, ConverterParameter=Name}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="SelectionChanged">
+                                                    <i:InvokeCommandAction Command="{Binding MidiDeviceChangedCommand}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                         </ComboBox>
 
                                         <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
@@ -1355,24 +1497,6 @@
                             </GroupBox>
                         </Grid>
 
-                        <!--<TextBlock Text="Attack" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" />
-
-                        <Slider Grid.Row="1" x:Name="EnvelopeAttack"
-                                Orientation="Vertical"
-                                Height="100"
-                                Margin="0"
-                                LargeChange=".2"
-                                HorizontalAlignment="Center"
-                                TickPlacement="TopLeft"
-                                TickFrequency="1"
-                                Value=".5"
-                                Minimum=".01"
-                                Maximum="10"/>
-
-                        <TextBlock Grid.Row="2" 
-                                   Text="{Binding ElementName=EnvelopeAttack, Path=Value, StringFormat={}{0:0.00}}" 
-                                   HorizontalAlignment="Center" 
-                                   Foreground="White" />-->
 
                     </Grid>
                 </Border>

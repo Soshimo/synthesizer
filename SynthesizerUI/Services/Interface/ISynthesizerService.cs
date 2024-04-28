@@ -1,6 +1,6 @@
 ﻿using SynthesizerUI.Model;
 
-namespace SynthesizerUI.Services;
+namespace SynthesizerUI.Services.Interface;
 
 public interface ISynthesizerService
 {

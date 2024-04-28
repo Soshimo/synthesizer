@@ -1,21 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
+using NAudio.CoreAudioApi;
+using NAudio.Midi;
 using SynthesizerLibrary.Util;
 using SynthesizerUI.Model;
-using SynthesizerUI.Services;
+using SynthesizerUI.Services.Interface;
 
 namespace SynthesizerUI.ViewModel;
 
-public class MainWindowViewModel : ObservableObject
+public class MainWindowViewModel : ViewModelBase
 {
+    private readonly BackgroundWorker _worker;
+
+    private readonly SynchronizationContext? _synchronizationContext = SynchronizationContext.Current;
 
     private float _modFrequency = 0;
     private string _selectedModShape = "saw";
@@ -33,143 +43,128 @@ public class MainWindowViewModel : ObservableObject
     private float _osc1Mix = 0;
     private float _osc2Mix = 0;
 
+    private float _volumeEnvelopeAttack = 0;
+    private float _volumeEnvelopeDecay = 0;
+    private float _volumeEnvelopeSustain = 0;
+    private float _volumeEnvelopeRelease = 0;
+
+    private float _filterCutoff = 0;
+    private float _filterResonance = 0;
+    private float _filterMod = 0;
+    private float _filterEnvelope = 0;
+
+    private float _masterDrive;
+    private float _masterVolume;
+    private float _masterReverb;
+
     public string[] OscillatorShapes { get; } = new[] { "sine", "square", "saw", "triangle" };
 
-    public ObservableCollection<string> MidiDevices { get; }
-
-    private string _keyboardOctave = "0";
-    private string _selectedDevice = "";
-    public ObservableCollection<PianoKeyViewModel> PianoKeys { get; } = new();
-    
-    private int _value = 25;
-
+    private string _keyboardOctave = "Normal";
+   
     private int _baseOctave = 2;
 
     private readonly ISynthesizerService _synthesizerService;
 
-    //private readonly List<Key> _assignedKeyList =
-    //[
-    //    Key.A,
-    //    Key.W,
-    //    Key.S,
-    //    Key.E,
-    //    Key.D,
-    //    Key.F,
-    //    Key.T,
-    //    Key.G,
-    //    Key.Y,
-    //    Key.H,
-    //    Key.U,
-    //    Key.J,
-    //    Key.K,
-    //    Key.I,
-    //    Key.L,
-    //    Key.O,
-    //    Key.OemSemicolon,
-    //    Key.OemQuotes,
-    //    Key.P,
-    //    Key.Enter,
-    //    Key.OemOpenBrackets,
-    //    Key.B,
-    //    Key.N,
-    //    Key.M
-    //];
+    private readonly ObservableCollection<MidiDeviceInfo> _availableDevices;
 
-    //private readonly List<bool> _isBlackList =
-    //[
-    //    false, true, false, true, false, false, true, false, true, false, true, false, false, true, false, true,
-    //    false, false, true, false, true, false, true, false
-    //];
+    private MidiDeviceInfo? _selectedDevice;
+    private List<MidiDeviceInfo> _previousDevices;
+    private MidiIn? _midiIn;
 
-    //private readonly List<string> _noteList =
-    //[
-    //    "C", "C#", "D", "D#", "E", "F",
-    //    "F#", "G", "G#", "A", "A#", "B",
-    //    "C", "C#", "D", "D#", "E", "F",
-    //    "F#", "G", "G#", "A", "A#", "B"
-    //];
+    private readonly IDialogService _dialogService;
 
-    //public ICommand KeyPressCommand { get; }
-    //public ICommand KeyReleaseCommand { get; }
-
-    public MainWindowViewModel(ISynthesizerService synthesizerService)
+    public MainWindowViewModel(ISynthesizerService synthesizerService, IDialogService dialogService, ILogger<MainWindowViewModel> logger)
     {
         _synthesizerService = synthesizerService;
+        _dialogService = dialogService;
 
-        MidiDevices = new ObservableCollection<string>();
+        AvailableDevices = new ObservableCollection<MidiDeviceInfo>();
+        AvailableDevices = new ObservableCollection<MidiDeviceInfo>();
 
-        //InitializeKeyboard();
+        _worker = new BackgroundWorker();
+        _worker.DoWork += Worker_DoWork;
+        _worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+        _worker.RunWorkerAsync();
 
-        //KeyReleaseCommand = new RelayCommand<PianoKeyViewModel>(model =>
-        //{
-        //    var note = $"{model?.Note}{model?.Octave + BaseOctave}";
-        //    _synthesizerService.NoteOff(note);
-        //});
+        _previousDevices = new List<MidiDeviceInfo>(AvailableDevices);
 
-        //KeyPressCommand = new RelayCommand<PianoKeyPressedEventArgs>(args =>
-        //{
-        //    var model = args?.DataContext;
+        MidiDeviceChangedCommand = new RelayCommand(() =>
+        {
+            if (SelectedDevice == null)
+            {
+                _midiIn?.Stop();
+                _midiIn?.Dispose();
 
-        //    var note = $"{model?.Note}{model?.Octave + BaseOctave}";
-        //    var (index, octave) = NoteHelper.ParseNoteString(note);
-        //    var frequency = (float)NoteHelper.NoteToFrequency(index, octave);
+                _midiIn = null;
+                return;
+            }
 
-        //    var data = GetVoiceData(frequency);
+            _dialogService.ShowDialog<DialogTemplates.Notification>(result =>
+            {
+                if (!bool.TryParse(result, out var dialogResult)) return;
+                if (!dialogResult)
+                {
+                    SelectedDevice = null;
+                    return;
+                }
 
-        //    _synthesizerService.NoteOn(note, data);
-        //});
+                _midiIn = new MidiIn(SelectedDevice.Id);
+                _midiIn.MessageReceived += MidiIn_MessageReceived;
+                _midiIn.ErrorReceived += MidiIn_ErrorReceived;
+                _midiIn.Start();
+            });
+
+
+        });
     }
 
-
-    private VoiceData GetVoiceData(float frequency)
+    public ObservableCollection<MidiDeviceInfo> AvailableDevices
     {
-        return new VoiceData(frequency, .01f, .1f, .7f, .1f);
+        get => _availableDevices;
+        private init => SetProperty(ref _availableDevices, value);
+    }
+    public float FilterCutoff
+    {
+        get => _filterCutoff;
+        set => SetProperty(ref _filterCutoff, value);
+    }
+    public float FilterResonance
+    {
+        get => _filterResonance;
+        set => SetProperty(ref _filterResonance, value);
+    }
+    public float FilterMod
+    {
+        get => _filterMod;
+        set => SetProperty(ref _filterMod, value);
+    }
+    public float FilterEnvelopeMix
+    {
+        get => _filterEnvelope;
+        set => SetProperty(ref _filterEnvelope, value);
+    }
+    public float VolumeEnvelopeRelease
+    {
+        get => _volumeEnvelopeRelease; 
+        set => SetProperty(ref _volumeEnvelopeRelease, value);
+    }
+    public float VolumeEnvelopeSustain
+    {
+        get => _volumeEnvelopeSustain;
+        set => SetProperty(ref _volumeEnvelopeSustain, value);
+    }
+    public float VolumeEnvelopeDecay
+    {
+        get => _volumeEnvelopeDecay;
+        set => SetProperty(ref _volumeEnvelopeDecay, value);
     }
 
-
-    //private void InitializeKeyboard()
-    //{
-    //    const int numKeys = 24;
-
-    //    var octave = 0;
-    //    for (var i = 0; i < numKeys; i++)
-    //    {
-    //        if (_noteList[i] == "A") octave++;
-
-    //        var key = new PianoKeyViewModel()
-    //        {
-    //            AssignedKey = _assignedKeyList[i],
-    //            IsBlack = _isBlackList[i],
-    //            Note = _noteList[i],
-    //            Octave = octave,
-    //            Index = i
-    //        };
-
-    //        key.KeyPressed += Piano_KeyPressed;
-    //        key.KeyReleased += Piano_KeyReleased;
-
-    //        PianoKeys.Add(key);
-    //    }
-    //}
-
-    //private void Piano_KeyReleased(object? sender, KeyPressedEventArgs e)
-    //{
-    //    var note = $"{e.Note}{e.Octave + BaseOctave}";
-    //    _synthesizerService.NoteOff(note);
-    //}
-
-    //private void Piano_KeyPressed(object? sender, KeyPressedEventArgs e)
-    //{
-    //    var note = $"{e.Note}{e.Octave + BaseOctave}";
-
-    //    var (index, octave) = NoteHelper.ParseNoteString(note);
-    //    var frequency = (float)NoteHelper.NoteToFrequency(index, octave);
-
-    //    _synthesizerService.NoteOn(note, new VoiceData(frequency, .01f, .1f, .7f, .1f));
-    //}
-
-
-    public string SelectedDevice
+    public float VolumeEnvelopeAttack
+    {
+        get => _volumeEnvelopeAttack;
+        set => SetProperty(ref _volumeEnvelopeAttack, value);
+    }
+    public MidiDeviceInfo? SelectedDevice
     {
         get => _selectedDevice;
         set => SetProperty(ref _selectedDevice, value);
@@ -179,8 +174,6 @@ public class MainWindowViewModel : ObservableObject
         get => _keyboardOctave;
         set => SetProperty(ref _keyboardOctave, value);
     }
-
-
     public float Osc1Detune
     {
         get => _osc1Detune;
@@ -210,7 +203,6 @@ public class MainWindowViewModel : ObservableObject
         set => SetProperty(ref _osc1Tremolo, value);
     }
 
-
     public float Osc2Tremolo
     {
         get => _osc2Tremolo;
@@ -228,13 +220,8 @@ public class MainWindowViewModel : ObservableObject
         get => _baseOctave;
         set => SetProperty(ref _baseOctave, value);
     }
-    public int Value
-    {
-        get => _value;
-        set => SetProperty(ref _value, value);
-    }
     public string[] Shapes => OscillatorShapes;
-    public string[] KeyboardOctaves { get; } = new[] { "+3", "+2", "+1", "0", "-1", "-2", "-3" };
+    public string[] KeyboardOctaves { get; } = new[] { "+3", "+2", "+1", "Normal", "-1", "-2", "-3" };
 
     public string SelectedShape
     {
@@ -263,15 +250,34 @@ public class MainWindowViewModel : ObservableObject
         set => SetProperty(ref _osc2Waveform, value);
     }
 
+    public float MasterDrive
+    {
+        get => _masterDrive;
+        set => SetProperty(ref _masterDrive, value);
+    }
+
+    public float MasterVolume
+    {
+        get => _masterVolume;
+        set => SetProperty(ref _masterVolume, value);
+    }
+
+    public float MasterReverb
+    {
+        get => _masterReverb;
+        set => SetProperty(ref _masterReverb, value);
+    }
+
 
     public string[] Osc2Octaves { get; } = new[] { "16'", "8'", "4'" };
-
 
     public string Osc2Octave
     {
         get => _osc2Octave;
         set => SetProperty(ref _osc2Octave, value);
     }
+
+    public ICommand MidiDeviceChangedCommand { get; }
 
     public void ReleaseKey(string note, int keyboardOctave)
     {
@@ -292,5 +298,120 @@ public class MainWindowViewModel : ObservableObject
         _synthesizerService.NoteOn(note, data);
     }
 
+    private void MidiIn_ErrorReceived(object? sender, MidiInMessageEventArgs e)
+    {
+    }
+
+    private void MidiIn_MessageReceived(object? sender, MidiInMessageEventArgs e)
+    {
+        var chanel = e.MidiEvent.Channel;
+    }
+
+    private List<MidiDeviceInfo> UpdateAvailableDevices()
+    {
+        var currentDevices = new List<MidiDeviceInfo>();
+        for (int i = 0; i < MidiIn.NumberOfDevices; i++)
+        {
+            var info = new MidiDeviceInfo { Id = i, Name = MidiIn.DeviceInfo(i).ProductName };
+            currentDevices.Add(info);
+        }
+        return currentDevices;
+    }
+
+    private void Worker_DoWork(object? sender, DoWorkEventArgs e)
+    {
+        while (true)
+        {
+            Thread.Sleep(500); // Adjust polling interval as needed
+            var currentDevices = UpdateAvailableDevices();
+
+            // Custom comparer
+            var comparer = new MidiDeviceInfoComparer();
+
+            // Compare lists
+            var addedDevices = currentDevices.Except(_previousDevices, comparer).ToList();
+            var removedDevices = _previousDevices.Except(currentDevices, comparer).ToList();
+
+            if (addedDevices.Any() || removedDevices.Any())
+            {
+                e.Result = new { Added = addedDevices, Removed = removedDevices }; // Signal a change and data
+                break;
+            }
+
+            _previousDevices = currentDevices;
+        }
+    }
+
+    private void Worker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
+    {
+        if (e.Result != null)
+        {
+            var changes = (dynamic)e.Result; // Cast to access properties
+            if (changes.Added.Count != 0)
+            {
+                // Add new devices
+                foreach (var device in changes.Added)
+                {
+                    var deviceCapture = device as MidiDeviceInfo;
+
+                    _synchronizationContext?.Post(state =>
+                    {
+                        if (state is not MidiDeviceInfo deviceToAdd) return;
+                        AvailableDevices.Add(deviceToAdd);
+                    }, deviceCapture);
+                }
+            }
+
+            if (changes.Removed.Count != 0)
+            {
+                // Remove devices (by index)
+                for (var i = _previousDevices.Count - 1; i >= 0; i--) // iterate backwards for removals
+                {
+                    if (!changes.Removed.Contains(_previousDevices[i])) continue;
+
+                    _synchronizationContext?.Post(state =>
+                    {
+                        if (state == null) return;
+
+                        var index = (int)state;
+                        AvailableDevices.RemoveAt(index);
+
+                    }, i);
+
+                    if (_previousDevices[i].Name != SelectedDevice?.Name) continue;
+
+                    // Selected device removed
+                    MessageBox.Show("The selected MIDI device has been removed.", "Device Removed", MessageBoxButton.OK);
+                    SelectedDevice = null; // Update UI
+                }
+            }
+
+            _previousDevices = UpdateAvailableDevices(); // Update previous for next iteration
+        }
+
+        _worker.RunWorkerAsync(); // Restart polling
+    }
+
+
+    private VoiceData GetVoiceData(float frequency)
+    {
+        return new VoiceData(frequency, .01f, .1f, .7f, .1f);
+    }
+
+
 }
 
+public class MidiDeviceInfoComparer : IEqualityComparer<MidiDeviceInfo>
+{
+    public bool Equals(MidiDeviceInfo? x, MidiDeviceInfo? y)
+    {
+        if (ReferenceEquals(x, y)) return true;
+        if(x == null || y == null) return false;
+        return x.Name == y.Name;
+    }
+
+    public int GetHashCode(MidiDeviceInfo obj)
+    {
+        return obj.Name?.GetHashCode() ?? 0;
+    }
+}

@@ -38,9 +38,16 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
+    <PackageReference Include="log4net" Version="2.0.17" />
     <PackageReference Include="MaterialDesignColors" Version="2.0.7" />
     <PackageReference Include="MaterialDesignThemes" Version="4.6.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="NetEscapades.Extensions.Logging.RollingFile" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,6 +55,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\max_def.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -55,6 +65,7 @@
 
   <ItemGroup>
     <Folder Include="Behaviors\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

@@ -15,8 +15,7 @@
                 <ResourceDictionary Source="/Resources/Slider.xaml" />
 
                 <ResourceDictionary>
-
-
+                    <local:ViewModelLocator x:Key="ViewModelLocator" />
                 </ResourceDictionary>
 
             </ResourceDictionary.MergedDictionaries>

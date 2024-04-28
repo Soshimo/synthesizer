@@ -21,13 +21,7 @@ namespace SynthesizerUI
     {
         public MainWindow()
         {
-            var service = Ioc.Default.GetService<ISynthesizerService>();
-
-            if(service != null)
-                DataContext = new MainWindowViewModel(service);
-
             InitializeComponent();
-
         }
 
         private void CloseApp_Click(object sender, RoutedEventArgs e)
@@ -45,14 +39,14 @@ namespace SynthesizerUI
 
         private void PianoKeyboardControl_OnKeyPressed(object? sender, KeyPressedEventArgs e)
         {
-            var viewModel = (MainWindowViewModel)DataContext;
-            viewModel.PressKey(e.Note, e.Octave);
+            var viewModel = DataContext as MainWindowViewModel;
+            viewModel?.PressKey(e.Note, e.Octave);
         }
 
         private void PianoKeyboardControl_OnKeyReleased(object? sender, KeyPressedEventArgs e)
         {
-            var viewModel = (MainWindowViewModel)DataContext;
-            viewModel.ReleaseKey(e.Note, e.Octave);
+            var viewModel = DataContext as MainWindowViewModel;
+            viewModel?.ReleaseKey(e.Note, e.Octave);
         }
     }
 } 
