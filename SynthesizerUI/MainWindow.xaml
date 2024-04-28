@@ -1489,7 +1489,12 @@
                                       VerticalAlignment="Top" 
                                       HorizontalAlignment="Left"
                                       FontFamily="/Fonts/#Syncopate"
-                                      ToolTipService.ToolTip="Please select a waveform.">
+                                      ToolTipService.ToolTip="Please select an octave.">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Converter={StaticResource ObjectToDisplayValueConverter}, ConverterParameter=Display}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
                                         </ComboBox>
                                     </StackPanel>
                                 </Grid>

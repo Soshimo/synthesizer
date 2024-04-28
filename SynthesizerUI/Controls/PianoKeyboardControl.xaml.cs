@@ -111,7 +111,7 @@ namespace SynthesizerUI
 
             viewModel.IsPressed = true;
 
-            OnKeyPressed(new KeyPressedEventArgs(viewModel.Note, viewModel.Octave));
+            OnKeyPressed(new KeyPressedEventArgs(viewModel.Note, viewModel.Index));
         }
 
         private void UIElement_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -122,7 +122,7 @@ namespace SynthesizerUI
 
             viewModel.IsPressed = false;
 
-            OnKeyReleased(new KeyPressedEventArgs(viewModel.Note, viewModel.Octave));
+            OnKeyReleased(new KeyPressedEventArgs(viewModel.Note, viewModel.Index));
         }
 
         protected virtual void OnKeyReleased(KeyPressedEventArgs e)

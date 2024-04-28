@@ -2,12 +2,12 @@
 
 public class KeyPressedEventArgs : EventArgs
 {
-    public KeyPressedEventArgs(string note, int octave)
+    public KeyPressedEventArgs(string note, int index)
     {
         Note = note;
-        Octave = octave;
+        Index = index;
     }
 
+    public int Index { get;  }
     public string Note { get; }
-    public int Octave { get; }
 }
