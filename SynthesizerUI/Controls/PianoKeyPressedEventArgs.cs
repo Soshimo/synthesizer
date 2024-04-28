@@ -3,7 +3,12 @@ using SynthesizerUI.ViewModel;
 
 namespace SynthesizerUI;
 
-public class PianoKeyPressedEventArgs(RoutedEvent routedEvent, PianoKeyViewModel buttonDataContext) : RoutedEventArgs(routedEvent)
+public class PianoKeyPressedEventArgs : RoutedEventArgs
 {
-    public PianoKeyViewModel DataContext { get; private set; } = buttonDataContext;
+    public PianoKeyPressedEventArgs(RoutedEvent routedEvent, PianoKeyViewModel buttonDataContext) : base(routedEvent)
+    {
+        DataContext = buttonDataContext;
+    }
+
+    public PianoKeyViewModel DataContext { get; private set; }
 }

@@ -26,46 +26,49 @@ namespace SynthesizerUI
         public event EventHandler<KeyPressedEventArgs>? KeyReleased;
 
         private readonly List<Key> _assignedKeyList =
-        [
-            Key.A,
-            Key.W,
-            Key.S,
-            Key.E,
-            Key.D,
-            Key.F,
-            Key.T,
-            Key.G,
-            Key.Y,
-            Key.H,
-            Key.U,
-            Key.J,
-            Key.K,
-            Key.I,
-            Key.L,
-            Key.O,
-            Key.OemSemicolon,
-            Key.OemQuotes,
-            Key.P,
-            Key.Enter,
-            Key.OemOpenBrackets,
-            Key.B,
-            Key.N,
-            Key.M
-        ];
+            new()
+            {
+                Key.A,
+                Key.W,
+                Key.S,
+                Key.E,
+                Key.D,
+                Key.F,
+                Key.T,
+                Key.G,
+                Key.Y,
+                Key.H,
+                Key.U,
+                Key.J,
+                Key.K,
+                Key.I,
+                Key.L,
+                Key.O,
+                Key.OemSemicolon,
+                Key.OemQuotes,
+                Key.P,
+                Key.Enter,
+                Key.OemOpenBrackets,
+                Key.B,
+                Key.N,
+                Key.M
+            };
 
         private readonly List<bool> _isBlackList =
-        [
-            false, true, false, true, false, false, true, false, true, false, true, false, false, true, false, true,
-            false, false, true, false, true, false, true, false
-        ];
+            new()
+            {
+                false, true, false, true, false, false, true, false, true, false, true, false, false, true, false, true,
+                false, false, true, false, true, false, true, false
+            };
 
         private readonly List<string> _noteList =
-        [
-            "C", "C#", "D", "D#", "E", "F",
-            "F#", "G", "G#", "A", "A#", "B",
-            "C", "C#", "D", "D#", "E", "F",
-            "F#", "G", "G#", "A", "A#", "B"
-        ];
+            new()
+            {
+                "C", "C#", "D", "D#", "E", "F",
+                "F#", "G", "G#", "A", "A#", "B",
+                "C", "C#", "D", "D#", "E", "F",
+                "F#", "G", "G#", "A", "A#", "B"
+            };
 
         public ObservableCollection<PianoKeyViewModel> PianoKeys { get; } = new ObservableCollection<PianoKeyViewModel>();
 

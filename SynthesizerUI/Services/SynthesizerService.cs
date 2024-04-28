@@ -11,7 +11,7 @@ public class SynthesizerService : ISynthesizerService
     private readonly Gain _masterGain;
 
     private readonly ObjectPool<Voice, VoiceFactory> _voiceObjectPool;
-    private readonly Dictionary<string, VoiceWrapper> _voiceDictionary = [];
+    private readonly Dictionary<string, VoiceWrapper> _voiceDictionary = new() { };
 
     private const int BaseOctave = 2;
 

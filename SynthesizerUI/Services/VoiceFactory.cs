@@ -3,10 +3,19 @@ using SynthesizerUI.Model;
 
 namespace SynthesizerUI.Services;
 
-public class VoiceFactory(AudioProvider provider, VoiceData data) : IObjectFactory<Voice>
+public class VoiceFactory : IObjectFactory<Voice>
 {
+    private readonly AudioProvider _provider;
+    private readonly VoiceData _data;
+
+    public VoiceFactory(AudioProvider provider, VoiceData data)
+    {
+        _provider = provider;
+        _data = data;
+    }
+
     public Voice CreateInstance()
     {
-        return new Voice(provider, data);
+        return new Voice(_provider, _data);
     }
 }
