@@ -1,5 +1,4 @@
-﻿using SythesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
+﻿using SynthesizerLibrary.Core.Audio.Interface;
 
 namespace SynthesizerLibrary.DSP;
 
@@ -16,6 +15,6 @@ public class ADSREnvelope : Envelope
 
     public void SetAttack(double value)
     {
-        _times[AttackIndex] = value;
+        Times[AttackIndex] = value;
     }
 }

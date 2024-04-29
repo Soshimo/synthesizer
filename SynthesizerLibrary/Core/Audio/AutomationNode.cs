@@ -1,4 +1,4 @@
-﻿using SythesizerLibrary.Core.Audio.Interface;
+﻿using SynthesizerLibrary.Core.Audio.Interface;
 
 namespace SynthesizerLibrary.Core.Audio;
 

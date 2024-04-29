@@ -1,10 +1,8 @@
 ﻿using SynthesizerLibrary.Core;
 using SynthesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core;
-using SythesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
+using SynthesizerLibrary.Core.Audio.Interface;
 
-namespace SythesizerLibrary.DSP;
+namespace SynthesizerLibrary.DSP;
 
 public class LP12Filter : AudioNode
 {
@@ -14,10 +12,10 @@ public class LP12Filter : AudioNode
     private double _previousCutoff;
     private double _previousResonance;
     // coefficients
-    private double w, q, r, c;
+    private double _w, _q, _r, _c;
 
-    private double _vibraSpeed = 0;
-    private double _vibraPos = 0;
+    private double _vibraSpeed;
+    private double _vibraPos;
 
     public LP12Filter(IAudioProvider provider, double cutoff = 20000, double resonance = 1) : base(provider, 3, 1)
     {
@@ -48,9 +46,9 @@ public class LP12Filter : AudioNode
         {
 
             var sample = input.Samples[i];
-            _vibraSpeed += (sample - _vibraPos) * c;
+            _vibraSpeed += (sample - _vibraPos) * _c;
             _vibraPos += _vibraSpeed;
-            _vibraSpeed *= r;
+            _vibraSpeed *= _r;
 
             output.Samples[i] = _vibraPos;
         }
@@ -59,10 +57,10 @@ public class LP12Filter : AudioNode
 
     private void CalcCoefficients()
     {
-        w = Math.PI * 2 * _cutoff.GetValue() / AudioProvider.SampleRate;
-        q = 1.0 - w / (2 * (_resonance.GetValue() + 0.5 / (1.0 + w)) + w - 2);
-        r = q * q;
-        c = r + 1 - 2 * Math.Cos(w) * q;
+        _w = Math.PI * 2 * _cutoff.GetValue() / AudioProvider.SampleRate;
+        _q = 1.0 - _w / (2 * (_resonance.GetValue() + 0.5 / (1.0 + _w)) + _w - 2);
+        _r = _q * _q;
+        _c = _r + 1 - 2 * Math.Cos(_w) * _q;
     }
 
 }

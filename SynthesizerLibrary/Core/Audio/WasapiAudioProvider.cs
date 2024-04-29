@@ -1,7 +1,6 @@
 ﻿using NAudio.Wave;
-using SynthesizerLibrary.Core.Audio;
 
-namespace SythesizerLibrary.Core.Audio;
+namespace SynthesizerLibrary.Core.Audio;
 
 public class WasapiAudioProvider : AudioProvider
 {

@@ -1,7 +1,5 @@
-﻿using System.Drawing;
-using SynthesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
+﻿using SynthesizerLibrary.Core.Audio;
+using SynthesizerLibrary.Core.Audio.Interface;
 
 namespace SynthesizerLibrary.DSP;
 

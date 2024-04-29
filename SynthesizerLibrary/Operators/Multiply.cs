@@ -1,10 +1,8 @@
 ﻿using SynthesizerLibrary.Core;
 using SynthesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core;
-using SythesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
+using SynthesizerLibrary.Core.Audio.Interface;
 
-namespace SythesizerLibrary.Operators;
+namespace SynthesizerLibrary.Operators;
 
 public class Multiply : AudioNode
 {

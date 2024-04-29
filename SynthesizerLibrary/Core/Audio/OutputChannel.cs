@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SythesizerLibrary.Core.Audio.Interface;
+﻿using SynthesizerLibrary.Core.Audio.Interface;
 
-namespace SythesizerLibrary.Core.Audio;
+namespace SynthesizerLibrary.Core.Audio;
 
 public class OutputChannel : IChannel
 {

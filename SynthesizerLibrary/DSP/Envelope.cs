@@ -1,9 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using SynthesizerLibrary.Core;
+﻿using SynthesizerLibrary.Core;
 using SynthesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core;
-using SythesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
+using SynthesizerLibrary.Core.Audio.Interface;
 
 namespace SynthesizerLibrary.DSP;
 
@@ -11,8 +8,8 @@ public class Envelope : AudioNode
 {
     public Automation Gate { get; }
 
-    protected readonly IList<double> _levels;
-    protected readonly IList<double> _times;
+    protected readonly IList<double> Levels;
+    protected readonly IList<double> Times;
 
     private readonly int? _releaseStage;
 
@@ -29,15 +26,15 @@ public class Envelope : AudioNode
     {
         Gate = new Automation(this, 0, gate ?? 1);
 
-        _levels = levels.ToList();
-        _times = times.ToList();
+        Levels = levels.ToList();
+        Times = times.ToList();
         _releaseStage = releaseStage;
 
         _stage = null;
         _time = null;
         _changeTime = null;
 
-        _level = _levels[0];
+        _level = Levels[0];
         _delta = 0;
         _gateOn = false;
 
@@ -54,7 +51,7 @@ public class Envelope : AudioNode
             _stage = 0;
             _time = 0;
             _delta = 0;
-            _level = _levels[0];
+            _level = Levels[0];
             if (_stage != _releaseStage)
             {
                 stageChanged = true;
@@ -91,7 +88,7 @@ public class Envelope : AudioNode
 
         if (stageChanged)
         {
-            if (_stage != _times.Count)
+            if (_stage != Times.Count)
             {
                 if (_stage != null)
                 {
@@ -117,16 +114,16 @@ public class Envelope : AudioNode
 
     private double CalculateDelta(int stage, double level)
     {
-        if(stage >= _levels.Count) return 0;
+        if(stage >= Levels.Count) return 0;
 
-        var delta = _levels[stage + 1] - level;
-        var time = _times[stage] * AudioProvider.SampleRate;
+        var delta = Levels[stage + 1] - level;
+        var time = Times[stage] * AudioProvider.SampleRate;
         return (delta / time);
     }
 
     private int CalculateChangeTime(int stage, int time)
     {
-        var stageTime = _times[stage] * AudioProvider.SampleRate;
+        var stageTime = Times[stage] * AudioProvider.SampleRate;
         return (int)(time + stageTime);
     }
 

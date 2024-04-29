@@ -1,6 +1,5 @@
 ﻿using NAudio.Wave;
-using SythesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
+using SynthesizerLibrary.Core.Audio.Interface;
 
 namespace SynthesizerLibrary.Core.Audio;
 
@@ -11,7 +10,7 @@ public class AudioProvider : WaveProvider32, IAudioProvider
 
     public Scheduler? Scheduler { get; private set; }
 
-    public AudioProvider()
+    protected AudioProvider()
     {
         _device = new AudioDevice(this);
         Scheduler = new Scheduler(this);

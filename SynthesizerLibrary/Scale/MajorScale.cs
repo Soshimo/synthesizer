@@ -1,6 +1,6 @@
-﻿using SythesizerLibrary.Tuning;
+﻿using SynthesizerLibrary.Tuning;
 
-namespace SythesizerLibrary.Scale;
+namespace SynthesizerLibrary.Scale;
 
 public class MajorScale : Scale
 {

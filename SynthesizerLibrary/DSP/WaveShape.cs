@@ -1,4 +1,4 @@
-﻿namespace SythesizerLibrary.DSP;
+﻿namespace SynthesizerLibrary.DSP;
 
 public enum WaveShape
 {

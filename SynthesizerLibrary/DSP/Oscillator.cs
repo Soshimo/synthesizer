@@ -1,7 +1,6 @@
 ﻿using SynthesizerLibrary.Core;
 using SynthesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
-using SythesizerLibrary.DSP;
+using SynthesizerLibrary.Core.Audio.Interface;
 
 namespace SynthesizerLibrary.DSP;
 

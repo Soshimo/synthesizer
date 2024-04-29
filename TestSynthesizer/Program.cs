@@ -1,17 +1,12 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using SynthesizerLibrary.Core;
 using SynthesizerLibrary.Core.Audio;
+using SynthesizerLibrary.Core.Audio.Interface;
 using SynthesizerLibrary.DSP;
+using SynthesizerLibrary.Operators;
+using SynthesizerLibrary.Scale;
+using SynthesizerLibrary.Tuning;
 using SynthesizerLibrary.Util;
-using SythesizerLibrary.Core;
-using SythesizerLibrary.Core.Audio;
-using SythesizerLibrary.Core.Audio.Interface;
-using SythesizerLibrary.DSP;
-using SythesizerLibrary.Operators;
-using SythesizerLibrary.Scale;
-using SythesizerLibrary.Tuning;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 var audioProvider = new WasapiAudioProvider();

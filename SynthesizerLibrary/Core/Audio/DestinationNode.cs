@@ -1,10 +1,6 @@
-﻿using SynthesizerLibrary.Core;
-using SynthesizerLibrary.Core.Audio;
-using SynthesizerLibrary.DSP;
-using SythesizerLibrary.Core.Audio.Interface;
-using SythesizerLibrary.DSP;
+﻿using SynthesizerLibrary.DSP;
 
-namespace SythesizerLibrary.Core.Audio;
+namespace SynthesizerLibrary.Core.Audio;
 
 public sealed class DestinationNode : GroupNode
 {
@@ -15,7 +11,7 @@ public sealed class DestinationNode : GroupNode
 
         InputPassThroughNodes[0].Connect(scheduler, 0, 0);
 
-        scheduler.Connect(mixer);
+        scheduler?.Connect(mixer);
         mixer.Connect(device);
     }
 }

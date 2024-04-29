@@ -1,4 +1,4 @@
-﻿namespace SythesizerLibrary.Tuning;
+﻿namespace SynthesizerLibrary.Tuning;
 
 public class WesternTuning : TuningBase
 {

@@ -1,5 +1,5 @@
-﻿using SythesizerLibrary.Core.Audio.Interface;
-using SythesizerLibrary.Operators;
+﻿using SynthesizerLibrary.Core.Audio.Interface;
+using SynthesizerLibrary.Operators;
 
 namespace SynthesizerLibrary.DSP;
 
