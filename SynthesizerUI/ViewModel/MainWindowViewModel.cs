@@ -26,10 +26,10 @@ public class MainWindowViewModel : ViewModelBase
     private float _osc2Tremolo = 17;
 
     private string _osc1Waveform = "sine";
-    private string _osc1Octave = "16'";
+    private OctaveSetting _osc1Octave;
 
     private string _osc2Waveform = "sine";
-    private string _osc2Octave = "8'";
+    private OctaveSetting _osc2Octave;
 
     private float _osc1Detune;
     private float _osc2Detune = -25;
@@ -62,10 +62,15 @@ public class MainWindowViewModel : ViewModelBase
     // ReSharper disable once NotAccessedField.Local
     private readonly IDialogService _dialogService;
 
+    private string _currentNote;
+
     public MainWindowViewModel(ISynthesizerService synthesizerService, IDialogService dialogService, ILogger<MainWindowViewModel> logger)
     {
         _synthesizerService = synthesizerService;
         _dialogService = dialogService;
+
+        _osc1Octave = Osc1Octaves[0];
+        _osc2Octave = Osc2Octaves[0];
 
         AvailableDevices = new ObservableCollection<MidiDeviceInfo>();
 
@@ -247,10 +252,13 @@ public class MainWindowViewModel : ViewModelBase
     }
 
 
-    public string[] Osc1Octaves { get; } = new[] { "32'", "16'", "8'" };
+    public OctaveSetting[] Osc1Octaves { get; } = new OctaveSetting[]
+    {
+        new() { Display = "32'", Index = 0 }, new() { Display = "16'", Index = 1 }, new() { Display = "8'", Index = 2 }
+    };
 
 
-    public string Osc1Octave
+    public OctaveSetting Osc1Octave
     {
         get => _osc1Octave;
         set => SetProperty(ref _osc1Octave, value);
@@ -279,43 +287,46 @@ public class MainWindowViewModel : ViewModelBase
         set => SetProperty(ref _masterReverb, value);
     }
 
+    public OctaveSetting[] Osc2Octaves { get; } = new OctaveSetting[]
+        { new() { Display = "16'", Index = 0}, new() { Display = "8'" , Index = 1}, new() {Display = "4'", Index = 2} };
 
-    public string[] Osc2Octaves { get; } = new[] { "16'", "8'", "4'" };
-
-    public string Osc2Octave
+    public OctaveSetting Osc2Octave
     {
         get => _osc2Octave;
         set => SetProperty(ref _osc2Octave, value);
     }
 
     public ICommand MidiDeviceChangedCommand { get; }
+    public string CurrentNote { get => _currentNote;
+        set => SetProperty(ref _currentNote, value);
+    }
 
     public void ReleaseKey(string note, int noteIndex)
     {
         var actualNoteIndex = noteIndex + ((BaseOctave + KeyboardOctave.Offset) * 12);
-        NoteOff(note, actualNoteIndex);
+        NoteOff(actualNoteIndex);
     }
 
     public void PressKey(string note, int noteIndex)
     {
         var actualNoteIndex = noteIndex + ((BaseOctave + KeyboardOctave.Offset) * 12);
-        NoteOn(note, actualNoteIndex);
+        NoteOn(actualNoteIndex);
     }
 
-    private void NoteOn(string note, int noteIndex)
+    private void NoteOn(int noteIndex)
     {
-        var key = $"{note}{noteIndex}";
+        //var key = $"{note}{noteIndex}";
 
         var frequency = (float)NoteHelper.NoteToFrequency(noteIndex);
 
         var data = GetVoiceData(frequency);
-        _synthesizerService.NoteOn(key, data);
+        _synthesizerService.NoteOn(noteIndex, data);
     }
 
-    private void NoteOff(string note, int noteIndex)
+    private void NoteOff(int noteIndex)
     {
-        var key = $"{note}{noteIndex}";
-        _synthesizerService.NoteOff(key);
+        //var key = $"{note}{noteIndex}";
+        _synthesizerService.NoteOff(noteIndex);
     }
 
     private void MidiIn_ErrorReceived(object? sender, MidiInMessageEventArgs e)
@@ -330,14 +341,16 @@ public class MainWindowViewModel : ViewModelBase
             {
                 if (e.MidiEvent is not NoteOnEvent note) return;
 
-                NoteOn(note.NoteName, note.NoteNumber);
+                CurrentNote = note.NoteName;
+                NoteOn(note.NoteNumber);
                 break;
             }
             case MidiCommandCode.NoteOff when e.MidiEvent.Channel == 1:
             {
                 if (e.MidiEvent is not NoteEvent note) return;
 
-                NoteOff(note.NoteName, note.NoteNumber);
+                CurrentNote = "";
+                NoteOff(note.NoteNumber);
                 break;
             }
             case MidiCommandCode.KeyAfterTouch:
@@ -409,20 +422,6 @@ public class MainWindowViewModel : ViewModelBase
         if (e.Result != null)
         {
             var changes = (dynamic)e.Result; // Cast to access properties
-            if (changes.Added.Count != 0)
-            {
-                // Add new devices
-                foreach (var device in changes.Added)
-                {
-                    var deviceCapture = device as MidiDeviceInfo;
-
-                    _synchronizationContext?.Post(state =>
-                    {
-                        if (state is not MidiDeviceInfo deviceToAdd) return;
-                        AvailableDevices.Add(deviceToAdd);
-                    }, deviceCapture);
-                }
-            }
 
             if (changes.Removed.Count != 0)
             {
@@ -448,6 +447,20 @@ public class MainWindowViewModel : ViewModelBase
                 }
             }
 
+            if (changes.Added.Count != 0)
+            {
+                // Add new devices
+                foreach (var device in changes.Added)
+                {
+                    var deviceCapture = device as MidiDeviceInfo;
+
+                    _synchronizationContext?.Post(state =>
+                    {
+                        if (state is not MidiDeviceInfo deviceToAdd) return;
+                        AvailableDevices.Add(deviceToAdd);
+                    }, deviceCapture);
+                }
+            }
             _previousDevices = UpdateAvailableDevices(); // Update previous for next iteration
         }
 
@@ -455,9 +468,12 @@ public class MainWindowViewModel : ViewModelBase
     }
 
 
-    private VoiceData GetVoiceData(float frequency)
+    private VoiceData GetVoiceData(float rootFrequency)
     {
-        return new VoiceData(frequency, .01f, .1f, .7f, .1f);
+        var frequency1 = rootFrequency * Math.Pow(2, _osc1Octave.Index - 2);
+        var frequency2 = rootFrequency * Math.Pow(2, _osc2Octave.Index - 1);
+
+        return new VoiceData(rootFrequency, (float)frequency1, (float)frequency2, Osc1Detune,  Osc2Detune,  .01f, .1f, .7f, .1f);
     }
 
 

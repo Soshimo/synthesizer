@@ -17,4 +17,16 @@ public class ADSREnvelope : Envelope
     {
         Times[AttackIndex] = value;
     }
+
+    public void SetDecay(double value)
+    {
+        Times[DecayIndex] = value;
+    }
+
+    public void SetRelease(double value) { Times[ReleaseIndex] = value; }
+
+    public void SetSustain(double value)
+    {
+        Levels[2] = value;
+    }
 }

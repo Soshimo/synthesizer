@@ -8,16 +8,18 @@ public class Oscillator : AudioNode
 {
     private readonly Automation _frequency;
     private readonly Automation _pulseWidth;
+    private readonly Automation _detune;
 
     private double _phase;
     private double _p;
 
     private WaveShape _waveShape;
 
-    public Oscillator(IAudioProvider provider, float frequency = 440f, WaveShape waveShape = WaveShape.Sine, float pulseWidth = 0.5f) : base(provider, 2, 1)
+    public Oscillator(IAudioProvider provider, float frequency = 440f, WaveShape waveShape = WaveShape.Sine, float detune = 0.0f, float pulseWidth = 0.5f) : base(provider, 3, 1)
     {
         _frequency = new Automation(this, 0, frequency);
-        _pulseWidth = new Automation(this, 1, pulseWidth);
+        _detune = new Automation(this, 1, detune);
+        _pulseWidth = new Automation(this, 2, pulseWidth);
 
         _waveShape = waveShape;
 
@@ -31,6 +33,11 @@ public class Oscillator : AudioNode
         _frequency.SetValue(frequency);
     }
 
+    public void SetDetune(double detune)
+    {
+        _detune.SetValue(detune);
+    }
+
     public void SetWaveShape(WaveShape waveShape)
     {
         _waveShape = waveShape;
@@ -41,7 +48,9 @@ public class Oscillator : AudioNode
         var output = Outputs[0];
 
         double pulseWidth = _pulseWidth;
-        double frequency = _frequency;
+        double detuneFactor = Math.Pow(2, _detune / 1200);
+        double frequency = _frequency * detuneFactor;
+
 
         output.Samples[0] = GetMix();
 

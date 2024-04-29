@@ -4,6 +4,6 @@ namespace SynthesizerUI.Services.Interface;
 
 public interface ISynthesizerService
 {
-    void NoteOn(string key, VoiceData data);
-    void NoteOff(string noteKey);
+    void NoteOn(int noteIndex, VoiceData data);
+    void NoteOff(int noteIndex);
 }
