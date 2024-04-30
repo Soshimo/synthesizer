@@ -17,8 +17,14 @@ public sealed class Voice : GroupNode, IPoolObject
 
     private readonly Oscillator _oscillator1;
     private readonly Oscillator _oscillator2;
+    private readonly LP12Filter _filterOscillator1;
+    private readonly LP12Filter _filterOscillator2;
 
-    public Voice(IAudioProvider provider, VoiceData voiceData) : base(provider, 10, 1)
+    private readonly Oscillator _modOscillator;
+    private readonly Gain _modOscillatorGain1;
+    private readonly Gain _modOscillatorGain2;
+
+    public Voice(IAudioProvider provider, VoiceData voiceData) : base(provider, 0, 1)
     {
         IsComplete = true;
 
@@ -30,33 +36,42 @@ public sealed class Voice : GroupNode, IPoolObject
         _oscillator1 = osc1;
         _oscillator2 = osc2;
 
-        _envelope = new ADSREnvelope(provider, 0, voiceData.Attack, voiceData.Decay, voiceData.Sustain, voiceData.Release);
+        _modOscillator = new Oscillator(provider, voiceData.ModFrequency, voiceData.ModWaveShape);
+        _modOscillatorGain1 = new Gain(provider, voiceData.ModOscillator1);
+        _modOscillatorGain2 = new Gain(provider, voiceData.ModOscillator2);
 
+        _modOscillator.Connect(_modOscillatorGain1);
+        _modOscillator.Connect(_modOscillatorGain2);
+
+        _modOscillatorGain1.Connect(osc1, 1); // tremolo
+        _modOscillatorGain2.Connect(osc2, 1); // tremolo
+
+        _envelope = new ADSREnvelope(provider, 0, voiceData.VolumeEnvelopeAttack, voiceData.VolumeEnvelopeDecay, voiceData.VolumeEnvelopeSustain, voiceData.VolumeEnvelopeRelease);
         _envelope.Complete += (sender, args) =>
         {
             Reset();
             OnVoiceComplete();
         };
 
+        _filterOscillator1 = new LP12Filter(provider, voiceData.FilterCutoff, voiceData.FilterResonance);
+        _filterOscillator2 = new LP12Filter(provider, voiceData.FilterCutoff, voiceData.FilterResonance);
+
         var osc1Gain = new Gain(provider, 0.5);
         var osc2Gain = new Gain(provider, 0.35);
 
         var masterGain = new Gain(provider);
 
-        InputPassThroughNodes[0].Connect(osc1);
-        InputPassThroughNodes[1].Connect(osc2);
-        InputPassThroughNodes[2].Connect(osc1, 1);
-        InputPassThroughNodes[3].Connect(osc2, 1);
+        osc1.Connect(_filterOscillator1);
+        osc2.Connect(_filterOscillator2);
 
-        osc1.Connect(osc1Gain);
-        osc2.Connect(osc2Gain);
+        _filterOscillator1.Connect(osc1Gain);
+        _filterOscillator2.Connect(osc2Gain);
 
         _envelope.Connect(osc1Gain, 1);
         _envelope.Connect(osc2Gain, 1);
 
         osc1Gain.Connect(masterGain);
         osc2Gain.Connect(masterGain);
-
 
         masterGain.Connect(OutputPassThroughNodes[0]);
     }
@@ -65,10 +80,10 @@ public sealed class Voice : GroupNode, IPoolObject
     {
         _voiceData = voiceData;
 
-        _envelope.SetAttack(voiceData.Attack);
-        _envelope.SetDecay(voiceData.Decay);
-        _envelope.SetRelease(voiceData.Release);
-        _envelope.SetSustain(voiceData.Sustain);
+        _envelope.SetAttack(voiceData.VolumeEnvelopeAttack);
+        _envelope.SetDecay(voiceData.VolumeEnvelopeDecay);
+        _envelope.SetRelease(voiceData.VolumeEnvelopeRelease);
+        _envelope.SetSustain(voiceData.VolumeEnvelopeSustain);
 
         
         _oscillator1.SetFrequency(voiceData.Oscillator1Frequency);

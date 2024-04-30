@@ -5,6 +5,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using NAudio.Midi;
+using SynthesizerLibrary.DSP;
 using SynthesizerLibrary.Util;
 using SynthesizerUI.Model;
 using SynthesizerUI.Services.Interface;
@@ -12,16 +13,16 @@ using SynthesizerUI.Services.Interface;
 namespace SynthesizerUI.ViewModel;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class MainWindowViewModel : ViewModelBase
+public class SynthesizerPageViewModel : ViewModelBase
 {
-    private readonly BackgroundWorker _worker;
+    //private readonly BackgroundWorker _worker;
 
     private readonly SynchronizationContext? _synchronizationContext = SynchronizationContext.Current;
 
     private const int BaseOctave = 4;
 
     private float _modFrequency = 2.1f;
-    private string _selectedModShape = "saw";
+    private OscillatorShape _selectedModShape;
     private float _osc1Tremolo = 15;
     private float _osc2Tremolo = 17;
 
@@ -55,22 +56,26 @@ public class MainWindowViewModel : ViewModelBase
     private readonly ISynthesizerService _synthesizerService;
 
     private MidiDeviceInfo? _selectedDevice;
-    private List<MidiDeviceInfo> _previousDevices;
+    //private List<MidiDeviceInfo> _previousDevices;
     private MidiIn? _midiIn;
 
 
     // ReSharper disable once NotAccessedField.Local
     private readonly IDialogService _dialogService;
+    private readonly ILogger<SynthesizerPageViewModel> _logger;
 
     private string _currentNote;
 
-    public MainWindowViewModel(ISynthesizerService synthesizerService, IDialogService dialogService, ILogger<MainWindowViewModel> logger)
+    public SynthesizerPageViewModel(ISynthesizerService synthesizerService, IDialogService dialogService, ILogger<SynthesizerPageViewModel> logger, IMIDIDeviceService midiDeviceService)
     {
         _synthesizerService = synthesizerService;
         _dialogService = dialogService;
 
+        _selectedModShape = OscillatorShapes[0];
+           
         _osc1Octave = Osc1Octaves[0];
         _osc2Octave = Osc2Octaves[0];
+        _logger = logger;
 
         AvailableDevices = new ObservableCollection<MidiDeviceInfo>();
 
@@ -87,64 +92,72 @@ public class MainWindowViewModel : ViewModelBase
 
         KeyboardOctave = KeyboardOctaves.First(k => k.Display == "Normal");
 
-        _worker = new BackgroundWorker();
-        _worker.DoWork += Worker_DoWork;
-        _worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-        _worker.RunWorkerAsync();
-
-        _previousDevices = new List<MidiDeviceInfo>(AvailableDevices);
-
-        MidiDeviceChangedCommand = new RelayCommand(() =>
+        midiDeviceService.DeviceConnected += (sender, args) =>
         {
-            if (SelectedDevice == null)
+            _synchronizationContext?.Post(state =>
             {
-                try
-                {
-                    _midiIn?.Stop();
+                if (state is not MidiDeviceInfo info) return;
+                AvailableDevices.Add(info);
+            }, args.Info);
+        };
 
-                }
-                catch (Exception ex)
+        midiDeviceService.DeviceRemoved += (sender, args) =>
+        {
+            var device = AvailableDevices.FirstOrDefault(d => d.Name == args.Info.Name);
+            if (device == null) return;
+            _synchronizationContext?.Post(state =>
+            {
+                if (state is not MidiDeviceInfo info) return;
+
+                if (SelectedDevice?.Name == info.Name)
                 {
-                    logger.LogError("Failed to stop the Midi device. {0}", ex);
+                    MessageBox.Show($"{info.Name} has been disconnected.");
                 }
 
-                if (_midiIn != null)
-                {
-                    _midiIn.MessageReceived -= MidiIn_MessageReceived;
-                    _midiIn.ErrorReceived -= MidiIn_ErrorReceived;
-                }
+                AvailableDevices.Remove(info);
+                SelectedDevice = null;
+            
+            }, device);
+        };
 
-                _midiIn?.Dispose();
-                _midiIn = null;
-                return;
+        MidiDeviceChangedCommand = new RelayCommand(MidiDeviceChanged);
+    }
+
+    private void MidiDeviceChanged()
+    {
+        if (SelectedDevice == null)
+        {
+            try
+            {
+                _midiIn?.Stop();
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to stop the Midi device. {0}", ex);
             }
 
-            _midiIn = new MidiIn(SelectedDevice.Id);
-            _midiIn.MessageReceived += MidiIn_MessageReceived;
-            _midiIn.ErrorReceived += MidiIn_ErrorReceived;
-            _midiIn.Start();
+            if (_midiIn != null)
+            {
+                _midiIn.MessageReceived -= MidiIn_MessageReceived;
+                _midiIn.ErrorReceived -= MidiIn_ErrorReceived;
+            }
 
-            //_dialogService.ShowDialog<DialogTemplates.Notification>(result =>
-            //{
-            //    if (!bool.TryParse(result, out var dialogResult)) return;
-            //    if (!dialogResult)
-            //    {
-            //        SelectedDevice = null;
-            //        return;
-            //    }
+            _midiIn?.Dispose();
+            _midiIn = null;
+            return;
+        }
 
-            //    _midiIn = new MidiIn(SelectedDevice.Id);
-            //    _midiIn.MessageReceived += MidiIn_MessageReceived;
-            //    _midiIn.ErrorReceived += MidiIn_ErrorReceived;
-            //    _midiIn.Start();
-            //});
-        });
+        _midiIn = new MidiIn(SelectedDevice.Id);
+        _midiIn.MessageReceived += MidiIn_MessageReceived;
+        _midiIn.ErrorReceived += MidiIn_ErrorReceived;
+        _midiIn.Start();
     }
 
     public ObservableCollection<MidiDeviceInfo> AvailableDevices { get; }
     public ObservableCollection<KeyboardOctave> KeyboardOctaves { get; }
 
-    public string[] OscillatorShapes { get; } = { "sine", "square", "saw", "triangle" };
+    public OscillatorShape[] OscillatorShapes { get; } = { new() {Display = "sine", Value = WaveShape.Sine}, new () { Display = "square", Value = WaveShape.Square}, new() { Display = "saw", Value = WaveShape.Sine }, new() { Display = "triangle", Value = WaveShape.Sine } };
 
     public float FilterCutoff
     {
@@ -237,9 +250,7 @@ public class MainWindowViewModel : ViewModelBase
         get => _modFrequency;
         set => SetProperty(ref _modFrequency, value);
     }
-    public string[] Shapes => OscillatorShapes;
-
-    public string SelectedShape
+    public OscillatorShape SelectedShape
     {
         get => _selectedModShape;
         set => SetProperty(ref _selectedModShape, value);
@@ -382,99 +393,37 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private List<MidiDeviceInfo> UpdateAvailableDevices()
-    {
-        var currentDevices = new List<MidiDeviceInfo>();
-        for (var i = 0; i < MidiIn.NumberOfDevices; i++)
-        {
-            var info = new MidiDeviceInfo { Id = i, Name = MidiIn.DeviceInfo(i).ProductName };
-            currentDevices.Add(info);
-        }
-        return currentDevices;
-    }
-
-    private void Worker_DoWork(object? sender, DoWorkEventArgs e)
-    {
-        while (true)
-        {
-            Thread.Sleep(500); // Adjust polling interval as needed
-            var currentDevices = UpdateAvailableDevices();
-
-            // Custom comparer
-            var comparer = new MidiDeviceInfoComparer();
-
-            // Compare lists
-            var addedDevices = currentDevices.Except(_previousDevices, comparer).ToList();
-            var removedDevices = _previousDevices.Except(currentDevices, comparer).ToList();
-
-            if (addedDevices.Any() || removedDevices.Any())
-            {
-                e.Result = new { Added = addedDevices, Removed = removedDevices }; // Signal a change and data
-                break;
-            }
-
-            _previousDevices = currentDevices;
-        }
-    }
-
-    private void Worker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
-    {
-        if (e.Result != null)
-        {
-            var changes = (dynamic)e.Result; // Cast to access properties
-
-            if (changes.Removed.Count != 0)
-            {
-                // Remove devices (by index)
-                for (var i = _previousDevices.Count - 1; i >= 0; i--) // iterate backwards for removals
-                {
-                    if (!changes.Removed.Contains(_previousDevices[i])) continue;
-
-                    _synchronizationContext?.Post(state =>
-                    {
-                        if (state == null) return;
-
-                        var index = (int)state;
-                        AvailableDevices.RemoveAt(index);
-
-                    }, i);
-
-                    if (_previousDevices[i].Name != SelectedDevice?.Name) continue;
-
-                    // Selected device removed
-                    MessageBox.Show("The selected MIDI device has been removed.", "Device Removed", MessageBoxButton.OK);
-                    SelectedDevice = null; // Update UI
-                }
-            }
-
-            if (changes.Added.Count != 0)
-            {
-                // Add new devices
-                foreach (var device in changes.Added)
-                {
-                    var deviceCapture = device as MidiDeviceInfo;
-
-                    _synchronizationContext?.Post(state =>
-                    {
-                        if (state is not MidiDeviceInfo deviceToAdd) return;
-                        AvailableDevices.Add(deviceToAdd);
-                    }, deviceCapture);
-                }
-            }
-            _previousDevices = UpdateAvailableDevices(); // Update previous for next iteration
-        }
-
-        _worker.RunWorkerAsync(); // Restart polling
-    }
-
 
     private VoiceData GetVoiceData(float rootFrequency)
     {
-        var frequency1 = rootFrequency * Math.Pow(2, _osc1Octave.Index - 2);
-        var frequency2 = rootFrequency * Math.Pow(2, _osc2Octave.Index - 1);
+        var frequency1 = (float)(rootFrequency * Math.Pow(2, _osc1Octave.Index - 2));
+        var frequency2 = (float)(rootFrequency * Math.Pow(2, _osc2Octave.Index - 1));
 
-        return new VoiceData(rootFrequency, (float)frequency1, (float)frequency2, Osc1Detune,  Osc2Detune,  .01f, .1f, .7f, .1f);
+        return new VoiceData()
+        {
+            RootFrequency = rootFrequency,
+            Oscillator1Frequency = frequency1,
+            Oscillator2Frequency = frequency2,
+            Oscillator1Detune = Osc1Detune,
+            Oscillator2Detune = Osc1Detune,
+            FilterCutoff = FilterCutoff,
+            FilterResonance = FilterResonance,
+            VolumeEnvelopeAttack = VolumeEnvelopeAttack,
+            VolumeEnvelopeDecay = VolumeEnvelopeDecay,
+            VolumeEnvelopeRelease = VolumeEnvelopeRelease,
+            VolumeEnvelopeSustain = VolumeEnvelopeSustain,
+            ModFrequency = ModFrequency,
+            ModOscillator1 = Osc1Tremolo,
+            ModOscillator2 = Osc2Tremolo,
+            ModWaveShape = SelectedShape.Value
+        };
     }
 
 
+}
+
+public class OscillatorShape
+{
+    public string Display { get; set; }
+    public WaveShape Value {get; set; }
 }

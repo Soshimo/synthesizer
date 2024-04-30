@@ -1,23 +1,33 @@
-﻿using System.Windows;
-using FirstFloor.ModernUI.Windows.Controls;
-using SynthesizerUI.Controls;
-using SynthesizerUI.ViewModel;
+﻿using SynthesizerUI.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
-namespace SynthesizerUI
+namespace SynthesizerUI.Controls
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for SynthesizerPage.xaml
     /// </summary>
-    public partial class MainWindow : ModernWindow
+    public partial class SynthesizerPage : Page
     {
-        public MainWindow()
+        public SynthesizerPage()
         {
             InitializeComponent();
         }
 
         private void CloseApp_Click(object sender, RoutedEventArgs e)
         {
-            Close();
         }
 
         private void MainWindow_OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -40,4 +50,4 @@ namespace SynthesizerUI
             viewModel?.ReleaseKey(e.Note, e.Index);
         }
     }
-} 
+}

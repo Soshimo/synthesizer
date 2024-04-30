@@ -51,6 +51,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="ModernUI.WPF" Version="1.0.9" />
     <PackageReference Include="NetEscapades.Extensions.Logging.RollingFile" Version="2.5.0" />
   </ItemGroup>
 

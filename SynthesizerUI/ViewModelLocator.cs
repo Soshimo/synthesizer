@@ -5,6 +5,7 @@ namespace SynthesizerUI;
 
 public class ViewModelLocator
 {
-    public MainWindowViewModel? MainWindowViewModel => Ioc.Default.GetService<MainWindowViewModel>();
+    public SynthesizerPageViewModel? SynthesizerPageViewModel => Ioc.Default.GetService<SynthesizerPageViewModel>();
     public NotificationViewModel? NotificationViewModel => Ioc.Default.GetService<NotificationViewModel>();
+    public MainViewModel? MainWindowViewModel => Ioc.Default.GetService<MainViewModel>();
 }

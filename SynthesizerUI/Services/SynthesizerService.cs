@@ -20,13 +20,13 @@ public class SynthesizerService : ISynthesizerService
         
     public SynthesizerService()
     {
-        var factory = new VoiceFactory(_audioProvider, new VoiceData());
+        //var factory = new VoiceFactory(_audioProvider, new VoiceData());
         //_voiceObjectPool = new ObjectPool<Voice, VoiceFactory>(factory, 16);
 
         _masterGain = new Gain(_audioProvider);
 
         var curve = Enumerable.Range(0, 4096).Select(i => (double)i / 4096 * 2 - 1).ToArray();
-        _waveShaper = new WaveShaper(_audioProvider, CreateShaperCurve());
+        _waveShaper = new WaveShaper(_audioProvider, curve);
 
         _waveShaper.Connect(_masterGain);
         _audioProvider.ConnectToOutput(_masterGain);
@@ -64,11 +64,11 @@ public class SynthesizerService : ISynthesizerService
         //wrapper.Oscillator1Frequency.Value.SetValue(voiceData.Oscillator1Frequency);
         //wrapper.Oscillator2Frequency.Value.SetValue(voiceData.Oscillator2Frequency);
 
-        voiceObject.InitializeVoice(voiceData);
-        voiceObject.SetVolumeEnvelopeAttack(voiceData.Attack);
-        voiceObject.SetVolumeEnvelopeDecay(voiceData.Decay);
-        voiceObject.SetVolumeEnvelopeRelease(voiceData.Release);
-        voiceObject.SetVolumeEnvelopeSustain(voiceData.Sustain);
+        //voiceObject.InitializeVoice(voiceData);
+        //voiceObject.SetVolumeEnvelopeAttack(voiceData.Attack);
+        //voiceObject.SetVolumeEnvelopeDecay(voiceData.Decay);
+        //voiceObject.SetVolumeEnvelopeRelease(voiceData.Release);
+        //voiceObject.SetVolumeEnvelopeSustain(voiceData.Sustain);
         voiceObject.Connect(_waveShaper);
 
         voiceObject.NoteOn();

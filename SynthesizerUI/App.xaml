@@ -3,12 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SynthesizerUI"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
 
-                <materialDesign:CustomColorTheme BaseTheme="Light" PrimaryColor="Yellow" SecondaryColor="DarkGreen" />
+                <materialDesign:CustomColorTheme BaseTheme="Light" PrimaryColor="MidnightBlue" SecondaryColor="DarkGreen" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Combobox.xaml" />
 
@@ -17,6 +18,16 @@
                 <ResourceDictionary>
                     <local:ViewModelLocator x:Key="ViewModelLocator" />
                 </ResourceDictionary>
+
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.xaml" />
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Light.xaml"/>
+
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/Button.xaml" />
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/Converters.xaml" />
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/TextBlock.xaml" />
+
+                <ResourceDictionary Source="/Themes/SynthesizerWindowTemplate.xaml"></ResourceDictionary>
+
 
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

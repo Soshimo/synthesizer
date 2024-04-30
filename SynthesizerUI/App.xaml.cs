@@ -46,6 +46,7 @@ namespace SynthesizerUI
                 new ServiceCollection()
                     .AddSingleton<ISynthesizerService, SynthesizerService>()
                     .AddSingleton<IDialogService, DialogService>()
+                    .AddSingleton<IMIDIDeviceService, MIDIDeviceService>()
                     .AddTransient<DialogTemplates.Notification>()
                     .AddViewModels<ViewModelBase>()
                     .AddLogging(loggingBuilder =>
