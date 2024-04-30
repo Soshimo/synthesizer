@@ -15,7 +15,7 @@ public class VoiceData
     public float FilterResonance { get; set; }
     public float Oscillator2Detune { get; set; }
     public float Oscillator1Detune { get; set; }
-    public WaveShape ModWaveShape { get; set; }
+    public Waveform ModWaveShape { get; set; }
     public float ModFrequency { get; set; }
     public float ModOscillator1 { get; set; }
     public float ModOscillator2 { get; set; }

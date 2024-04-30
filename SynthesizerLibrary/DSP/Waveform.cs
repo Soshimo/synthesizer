@@ -1,6 +1,6 @@
 ﻿namespace SynthesizerLibrary.DSP;
 
-public enum WaveShape
+public enum Waveform
 {
     Sine,
     Triangle,

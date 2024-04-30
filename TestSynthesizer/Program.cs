@@ -135,7 +135,7 @@ class SynthVoice : GroupNode
     {
         IsComplete = true;
 
-        var osc1 = new Oscillator(provider, noteData.Frequency, WaveShape.Sine);
+        var osc1 = new Oscillator(provider, noteData.Frequency, Waveform.Sine);
 
         // TODO: get values from voice constructor
         _envelope = new ADSREnvelope(provider, 0, noteData.Attack, noteData.Decay, noteData.Sustain, noteData.Release);

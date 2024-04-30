@@ -24,6 +24,8 @@ namespace SynthesizerUI
         private bool _isDragging;
         private Point _lastMousePosition;
 
+        public event EventHandler<KnobChangedEventArgs> KnobChanged;
+
         public KnobControl()
         {
             InitializeComponent();
@@ -77,6 +79,8 @@ namespace SynthesizerUI
         {
             var control = (KnobControl)d;
             control.UpdateImage();
+
+            control.OnKnobChanged(new KnobChangedEventArgs() { OldValue = (double)e.OldValue, NewValue = (double)e.NewValue});
         }
 
 
@@ -234,5 +238,16 @@ namespace SynthesizerUI
             value = Math.Min(Math.Max(minimum, value), maximum);
             Value = Logarithmic ? Math.Pow(2, value) : value;
         }
+
+        protected virtual void OnKnobChanged(KnobChangedEventArgs e)
+        {
+            KnobChanged?.Invoke(this, e);
+        }
+    }
+
+    public class KnobChangedEventArgs : EventArgs
+    {
+        public double OldValue { get; set; }
+        public double NewValue { get; set; }
     }
 }

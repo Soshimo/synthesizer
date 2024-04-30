@@ -10,29 +10,35 @@ public class SynthesizerService : ISynthesizerService
 {
     private readonly WasapiAudioProvider _audioProvider = new();
     private readonly Gain _masterGain;
-    private readonly WaveShaper _waveShaper;
+    //private readonly WaveShaper _waveShaper;
+    private readonly WaveShaperGroup _waveShaperGroup;
 
-    //private readonly ObjectPool<Voice, VoiceFactory> _voiceObjectPool;
-    //private readonly Dictionary<string, VoiceWrapper> _voiceDictionary = new() { };
-
-    private Voice?[] _voices = new Voice?[256];
-    private VoiceWrapper?[] _wrappers = new VoiceWrapper?[256];
+    private readonly Voice?[] _voices = new Voice?[256];
         
     public SynthesizerService()
     {
-        //var factory = new VoiceFactory(_audioProvider, new VoiceData());
-        //_voiceObjectPool = new ObjectPool<Voice, VoiceFactory>(factory, 16);
-
         _masterGain = new Gain(_audioProvider);
 
-        var curve = Enumerable.Range(0, 4096).Select(i => (double)i / 4096 * 2 - 1).ToArray();
-        _waveShaper = new WaveShaper(_audioProvider, curve);
+        //var curve = Enumerable.Range(0, 4096).Select(i => (double)i / 4096 * 2 - 1).ToArray();
+        //_waveShaper = new WaveShaper(_audioProvider, curve);
 
-        _waveShaper.Connect(_masterGain);
+        //_waveShaper.Connect(_masterGain);
+
+        _waveShaperGroup = new WaveShaperGroup(_audioProvider);
+
+        // let's go ahead and set the drive to 50
+        _waveShaperGroup.SetDrive(50);
+
+        _waveShaperGroup.Connect(_masterGain);
+
         _audioProvider.ConnectToOutput(_masterGain);
         _audioProvider.Play();
     }
 
+    public void SetDrive(double value)
+    {
+        _waveShaperGroup.SetDrive(0.01 + (value * value / 500.0));
+    }
     private double[] CreateShaperCurve()
     {
         var driveShaper = new double[4096];
@@ -56,20 +62,9 @@ public class SynthesizerService : ISynthesizerService
         if (_voices[noteIndex] != null) return;
 
         var voiceObject = new Voice(_audioProvider, voiceData);
-        var wrapper = new VoiceWrapper(_audioProvider, voiceObject);
 
         _voices[noteIndex] = voiceObject;
-        _wrappers[noteIndex] = wrapper;
-
-        //wrapper.Oscillator1Frequency.Value.SetValue(voiceData.Oscillator1Frequency);
-        //wrapper.Oscillator2Frequency.Value.SetValue(voiceData.Oscillator2Frequency);
-
-        //voiceObject.InitializeVoice(voiceData);
-        //voiceObject.SetVolumeEnvelopeAttack(voiceData.Attack);
-        //voiceObject.SetVolumeEnvelopeDecay(voiceData.Decay);
-        //voiceObject.SetVolumeEnvelopeRelease(voiceData.Release);
-        //voiceObject.SetVolumeEnvelopeSustain(voiceData.Sustain);
-        voiceObject.Connect(_waveShaper);
+        voiceObject.Connect(_waveShaperGroup);
 
         voiceObject.NoteOn();
     }
@@ -82,11 +77,8 @@ public class SynthesizerService : ISynthesizerService
         voiceObject.NoteOff();
         voiceObject.VoiceComplete += (sender, args) =>
         {
-            _voices[noteIndex]?.Disconnect(_waveShaper);
-            _wrappers[noteIndex]?.Dispose();
-
+            _voices[noteIndex]?.Disconnect(_waveShaperGroup);
             _voices[noteIndex] = null;
-            _wrappers[noteIndex] = null;
         };
     }
 }

@@ -12,8 +12,8 @@
       mc:Ignorable="d" 
       DataContext="{Binding Path=SynthesizerPageViewModel, Source={StaticResource ViewModelLocator}}"
 
-      Background="White"
-      d:DesignHeight="960" d:DesignWidth="1080"
+      Background="Transparent"
+      d:DesignHeight="930" d:DesignWidth="1080"
       KeyDown="MainWindow_OnKeyDown"
       KeyUp="MainWindow_OnKeyUp"
       Title="SynthesizerPage">
@@ -365,7 +365,7 @@
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0" HorizontalAlignment="Center" BorderBrush="black" BorderThickness="2" Padding="10"
-                        CornerRadius="10" Background="Transparent" Margin="10 0">
+                        CornerRadius="10" Background="Transparent" Margin="10 5 0 0">
                     <Border.Effect>
                         <DropShadowEffect ShadowDepth="3" Direction="315" Color="Black" BlurRadius="5" Opacity="0.5" />
                     </Border.Effect>
@@ -447,6 +447,13 @@
                                                             </dependencyObjects:SpriteSheet.Range>
                                                         </dependencyObjects:SpriteSheet>
                                                     </synthesizerUi:KnobControl.SpriteSheet>
+
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="KnobChanged">
+                                                            <i:InvokeCommandAction Command="{Binding KnobChangedCommand}" CommandParameter="ModFrequency" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+
                                                 </synthesizerUi:KnobControl>
 
                                                 <Label Style="{DynamicResource MaterialDesignLabel}"
@@ -566,13 +573,19 @@
                                                   materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource SecondaryHueLightBrush}"
                                                   materialDesign:ColorZoneAssist.Mode="Dark"
                                                   materialDesign:HintAssist.Hint="waveform"
-                                                  ItemsSource="{Binding Shapes}"
+                                                  ItemsSource="{Binding OscillatorShapes}"
                                                   SelectedItem="{Binding Osc1Waveform, Mode=TwoWay}"
                                                   VerticalAlignment="Top"
                                                   HorizontalAlignment="Left"
                                                   Width="140"
                                                   FontFamily="/Fonts/#Syncopate"
                                                   ToolTipService.ToolTip="Please select a waveform.">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock
+                                                            Text="{Binding Converter={StaticResource ObjectToDisplayValueConverter}, ConverterParameter=Display}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
                                             </ComboBox>
                                             <Grid Margin="0, 10, 0, 0" VerticalAlignment="Bottom">
 
@@ -692,13 +705,19 @@
                                                   materialDesign:TextFieldAssist.UnderlineBrush="{DynamicResource SecondaryHueLightBrush}"
                                                   materialDesign:ColorZoneAssist.Mode="Dark"
                                                   materialDesign:HintAssist.Hint="waveform"
-                                                  ItemsSource="{Binding Shapes}"
+                                                  ItemsSource="{Binding OscillatorShapes}"
                                                   SelectedItem="{Binding Osc2Waveform, Mode=TwoWay}"
                                                   VerticalAlignment="Top"
                                                   HorizontalAlignment="Left"
                                                   Width="140"
                                                   FontFamily="/Fonts/#Syncopate"
                                                   ToolTipService.ToolTip="Please select a waveform.">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock
+                                                            Text="{Binding Converter={StaticResource ObjectToDisplayValueConverter}, ConverterParameter=Display}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
                                             </ComboBox>
 
                                             <Grid Margin="0, 10, 0, 0" VerticalAlignment="Bottom">
@@ -1467,6 +1486,12 @@
                                                     </dependencyObjects:SpriteSheet.Range>
                                                 </dependencyObjects:SpriteSheet>
                                             </synthesizerUi:KnobControl.SpriteSheet>
+
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="KnobChanged">
+                                                    <i:InvokeCommandAction Command="{Binding KnobChangedCommand}" CommandParameter="MasterDrive" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
 
                                         </synthesizerUi:KnobControl>
 

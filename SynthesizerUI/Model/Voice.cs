@@ -24,6 +24,10 @@ public sealed class Voice : GroupNode, IPoolObject
     private readonly Gain _modOscillatorGain1;
     private readonly Gain _modOscillatorGain2;
 
+    private readonly WaveShaper _waveShaper;
+    private readonly Gain _waveShaperPreGain;
+    private readonly Gain _waveShaperPostGain;
+
     public Voice(IAudioProvider provider, VoiceData voiceData) : base(provider, 0, 1)
     {
         IsComplete = true;
@@ -74,23 +78,6 @@ public sealed class Voice : GroupNode, IPoolObject
         osc2Gain.Connect(masterGain);
 
         masterGain.Connect(OutputPassThroughNodes[0]);
-    }
-
-    public void InitializeVoice(VoiceData voiceData)
-    {
-        _voiceData = voiceData;
-
-        _envelope.SetAttack(voiceData.VolumeEnvelopeAttack);
-        _envelope.SetDecay(voiceData.VolumeEnvelopeDecay);
-        _envelope.SetRelease(voiceData.VolumeEnvelopeRelease);
-        _envelope.SetSustain(voiceData.VolumeEnvelopeSustain);
-
-        
-        _oscillator1.SetFrequency(voiceData.Oscillator1Frequency);
-        _oscillator2.SetFrequency(voiceData.Oscillator2Frequency);
-
-        _oscillator1.SetDetune(voiceData.Oscillator1Detune);
-        _oscillator2.SetDetune(voiceData.Oscillator2Detune);
     }
 
     public void NoteOn()

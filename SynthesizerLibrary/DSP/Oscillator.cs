@@ -13,9 +13,9 @@ public class Oscillator : AudioNode
     private double _phase;
     private double _p;
 
-    private WaveShape _waveShape;
+    private Waveform _waveShape;
 
-    public Oscillator(IAudioProvider provider, float frequency = 440f, WaveShape waveShape = WaveShape.Sine, float detune = 0.0f, float pulseWidth = 0.5f) : base(provider, 3, 1)
+    public Oscillator(IAudioProvider provider, float frequency = 440f, Waveform waveShape = Waveform.Sine, float detune = 0.0f, float pulseWidth = 0.5f) : base(provider, 3, 1)
     {
         _frequency = new Automation(this, 0, frequency);
         _detune = new Automation(this, 1, detune);
@@ -38,7 +38,7 @@ public class Oscillator : AudioNode
         _detune.SetValue(detune);
     }
 
-    public void SetWaveShape(WaveShape waveShape)
+    public void SetWaveShape(Waveform waveShape)
     {
         _waveShape = waveShape;
     }
@@ -64,12 +64,12 @@ public class Oscillator : AudioNode
     {
         return _waveShape switch
         {
-            WaveShape.Sine => Sine(),
-            WaveShape.Triangle => Triangle(),
-            WaveShape.Square => Square(),
-            WaveShape.Sawtooth => Sawtooth(),
-            WaveShape.InvSawtooth => InvSawtooth(),
-            WaveShape.Pulse => Pulse(),
+            Waveform.Sine => Sine(),
+            Waveform.Triangle => Triangle(),
+            Waveform.Square => Square(),
+            Waveform.Sawtooth => Sawtooth(),
+            Waveform.InvSawtooth => InvSawtooth(),
+            Waveform.Pulse => Pulse(),
             _ => throw new ArgumentOutOfRangeException(nameof(_waveShape))
         };
     }

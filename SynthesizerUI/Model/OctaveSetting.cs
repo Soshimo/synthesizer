@@ -1,4 +1,4 @@
-﻿namespace SynthesizerUI.ViewModel
+﻿namespace SynthesizerUI.Model
 {
     public class OctaveSetting
     {

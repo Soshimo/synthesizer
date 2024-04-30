@@ -15,8 +15,6 @@ namespace SynthesizerUI.ViewModel;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class SynthesizerPageViewModel : ViewModelBase
 {
-    //private readonly BackgroundWorker _worker;
-
     private readonly SynchronizationContext? _synchronizationContext = SynchronizationContext.Current;
 
     private const int BaseOctave = 4;
@@ -26,10 +24,10 @@ public class SynthesizerPageViewModel : ViewModelBase
     private float _osc1Tremolo = 15;
     private float _osc2Tremolo = 17;
 
-    private string _osc1Waveform = "sine";
+    private OscillatorShape _osc1Waveform;
     private OctaveSetting _osc1Octave;
 
-    private string _osc2Waveform = "sine";
+    private OscillatorShape _osc2Waveform;
     private OctaveSetting _osc2Octave;
 
     private float _osc1Detune;
@@ -51,7 +49,7 @@ public class SynthesizerPageViewModel : ViewModelBase
     private float _masterVolume = 75;
     private float _masterReverb = 32;
 
-    private KeyboardOctave _keyboardOctave;
+    private KeyboardOctave? _keyboardOctave;
 
     private readonly ISynthesizerService _synthesizerService;
 
@@ -64,7 +62,7 @@ public class SynthesizerPageViewModel : ViewModelBase
     private readonly IDialogService _dialogService;
     private readonly ILogger<SynthesizerPageViewModel> _logger;
 
-    private string _currentNote;
+    private string? _currentNote;
 
     public SynthesizerPageViewModel(ISynthesizerService synthesizerService, IDialogService dialogService, ILogger<SynthesizerPageViewModel> logger, IMIDIDeviceService midiDeviceService)
     {
@@ -72,6 +70,8 @@ public class SynthesizerPageViewModel : ViewModelBase
         _dialogService = dialogService;
 
         _selectedModShape = OscillatorShapes[0];
+        _osc1Waveform = OscillatorShapes[0];
+        _osc2Waveform = OscillatorShapes[0];
            
         _osc1Octave = Osc1Octaves[0];
         _osc2Octave = Osc2Octaves[0];
@@ -79,7 +79,7 @@ public class SynthesizerPageViewModel : ViewModelBase
 
         AvailableDevices = new ObservableCollection<MidiDeviceInfo>();
 
-        KeyboardOctaves = new ObservableCollection<KeyboardOctave>
+        KeyboardOctaves = new ObservableCollection<KeyboardOctave?>
         {
             new() { Display = "-3", Offset = -3 },
             new() { Display = "-2", Offset = -2 },
@@ -120,7 +120,18 @@ public class SynthesizerPageViewModel : ViewModelBase
             }, device);
         };
 
+        _synthesizerService.SetDrive(_masterDrive);
+
         MidiDeviceChangedCommand = new RelayCommand(MidiDeviceChanged);
+
+        KnobChangedCommand = new RelayCommand<string>((st) =>
+        {
+            // TODO: convert to an Enum
+            if (st == "MasterDrive")
+            {
+                _synthesizerService.SetDrive(_masterDrive);
+            }
+        });
     }
 
     private void MidiDeviceChanged()
@@ -155,9 +166,9 @@ public class SynthesizerPageViewModel : ViewModelBase
     }
 
     public ObservableCollection<MidiDeviceInfo> AvailableDevices { get; }
-    public ObservableCollection<KeyboardOctave> KeyboardOctaves { get; }
+    public ObservableCollection<KeyboardOctave?> KeyboardOctaves { get; }
 
-    public OscillatorShape[] OscillatorShapes { get; } = { new() {Display = "sine", Value = WaveShape.Sine}, new () { Display = "square", Value = WaveShape.Square}, new() { Display = "saw", Value = WaveShape.Sine }, new() { Display = "triangle", Value = WaveShape.Sine } };
+    public OscillatorShape[] OscillatorShapes { get; } = { new() {Display = "sine", Value = Waveform.Sine}, new () { Display = "square", Value = Waveform.Square}, new() { Display = "saw", Value = Waveform.Sine }, new() { Display = "triangle", Value = Waveform.Sine } };
 
     public float FilterCutoff
     {
@@ -205,7 +216,7 @@ public class SynthesizerPageViewModel : ViewModelBase
         get => _selectedDevice;
         set => SetProperty(ref _selectedDevice, value);
     }
-    public KeyboardOctave KeyboardOctave
+    public KeyboardOctave? KeyboardOctave
     {
         get => _keyboardOctave;
         set => SetProperty(ref _keyboardOctave, value);
@@ -256,7 +267,7 @@ public class SynthesizerPageViewModel : ViewModelBase
         set => SetProperty(ref _selectedModShape, value);
     }
 
-    public string Osc1Waveform
+    public OscillatorShape Osc1Waveform
     {
         get => _osc1Waveform;
         set => SetProperty(ref _osc1Waveform, value);
@@ -274,7 +285,7 @@ public class SynthesizerPageViewModel : ViewModelBase
         get => _osc1Octave;
         set => SetProperty(ref _osc1Octave, value);
     }
-    public string Osc2Waveform
+    public OscillatorShape Osc2Waveform
     {
         get => _osc2Waveform;
         set => SetProperty(ref _osc2Waveform, value);
@@ -308,9 +319,11 @@ public class SynthesizerPageViewModel : ViewModelBase
     }
 
     public ICommand MidiDeviceChangedCommand { get; }
-    public string CurrentNote { get => _currentNote;
+    public string? CurrentNote { get => _currentNote;
         set => SetProperty(ref _currentNote, value);
     }
+
+    public ICommand KnobChangedCommand { get; }
 
     public void ReleaseKey(string note, int noteIndex)
     {
@@ -393,7 +406,6 @@ public class SynthesizerPageViewModel : ViewModelBase
         }
     }
 
-
     private VoiceData GetVoiceData(float rootFrequency)
     {
         var frequency1 = (float)(rootFrequency * Math.Pow(2, _osc1Octave.Index - 2));
@@ -420,10 +432,4 @@ public class SynthesizerPageViewModel : ViewModelBase
     }
 
 
-}
-
-public class OscillatorShape
-{
-    public string Display { get; set; }
-    public WaveShape Value {get; set; }
 }

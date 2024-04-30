@@ -6,7 +6,7 @@ namespace SynthesizerLibrary.DSP;
 public class WaveShaper : AudioNode
 {
     private double[] _curve;
-    public WaveShaper(IAudioProvider provider, double[] curve = null) : base(provider, 1, 1)
+    public WaveShaper(IAudioProvider provider, double[]? curve = null) : base(provider, 1, 1)
     {
         _curve = curve ?? new double[4096];
     }
